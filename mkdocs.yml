@@ -1,0 +1,14 @@
+site_name: Zetin Humanoid RL
+nav:
+  - Home: index.md
+  - Setup Guide:
+    - Python Environment: setup/python-environment.md
+  - Quick Start: quick-start.md
+  - Concept:
+    - Outline: concept/outline.md
+    - Reward Design: concept/reward-design.md
+  - API Reference:
+    - bipedal_lab.base.env: api/bipedal_lab.base.env.md
+    - bipedal_lab.base.reward: api/bipedal_lab.base.reward.md
+theme:
+  name: material

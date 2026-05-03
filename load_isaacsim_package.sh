@@ -1,0 +1,1 @@
+source ${HOME}/workspace/NVIDIA-Omniverse/IsaacSim/setup_conda_env.sh
