@@ -1,0 +1,3367 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab.base.managers/">
+      
+      
+        <link rel="prev" href="../bipedal_lab.base.env/">
+      
+      
+        <link rel="next" href="../bipedal_lab.base.utils/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>bipedal_lab.base.managers - Zetin Humanoid RL</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#bipedal_lab.base.managers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Zetin Humanoid RL" class="md-header__button md-logo" aria-label="Zetin Humanoid RL" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Zetin Humanoid RL
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              bipedal_lab.base.managers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chanjun-nyam/Zetin-Humanoid-RL" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Zetin-Humanoid-RL
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Zetin Humanoid RL" class="md-nav__button md-logo" aria-label="Zetin Humanoid RL" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Zetin Humanoid RL
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chanjun-nyam/Zetin-Humanoid-RL" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Zetin-Humanoid-RL
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Setup Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/python-environment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python Environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concept
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concept/outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Outline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concept/reward-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reward Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bipedal_lab.base.env/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.env
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.managers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.managers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        managers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ArticulationDataManager
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ArticulationDataManager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.gravity_dir_b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gravity_dir_b
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.n_qdim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_qdim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qpos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qpos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qpos_default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qpos_default
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qpos_limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qpos_limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qtau" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qtau
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qvel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qvel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qvel_default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qvel_default
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.root_angvel_b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        root_angvel_b
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.root_linvel_t" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        root_linvel_t
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.root_quat_w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        root_quat_w
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManagerCfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ArticulationDataManagerCfg
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObservationManager
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ObservationManager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_act" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_act
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_history
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_obs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_obs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_priv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_priv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obs_hist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obs_hist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obs_priv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obs_priv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obs_t" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obs_t
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obsb_hist_n" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obsb_hist_n
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManagerCfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObservationManagerCfg
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bipedal_lab.base.utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bipedal_lab.base.math_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.math_utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Note
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Note
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../note/todo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    To-do List
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../note/idea/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Idea Note
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        managers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ArticulationDataManager
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ArticulationDataManager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.gravity_dir_b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gravity_dir_b
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.n_qdim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_qdim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qpos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qpos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qpos_default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qpos_default
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qpos_limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qpos_limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qtau" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qtau
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qvel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qvel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.qvel_default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qvel_default
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.root_angvel_b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        root_angvel_b
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.root_linvel_t" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        root_linvel_t
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.root_quat_w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        root_quat_w
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManager.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ArticulationDataManagerCfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ArticulationDataManagerCfg
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObservationManager
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ObservationManager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_act" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_act
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_history
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_obs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_obs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.n_priv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        n_priv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obs_hist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obs_hist
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obs_priv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obs_priv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obs_t" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obs_t
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.obsb_hist_n" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        obsb_hist_n
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManager.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.managers.ObservationManagerCfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObservationManagerCfg
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>bipedal_lab.base.managers</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="bipedal_lab.base.managers"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bipedal_lab.base.managers.ArticulationDataManager" class="doc doc-heading">
+            <code>ArticulationDataManager</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Manager class which process articulation data and track some useful quantities.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/articulation_data_manager.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ArticulationDataManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manager class which process articulation data and track some useful quantities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">ArticulationDataManagerCfg</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">DirectMARLEnv</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (ArticulationDataManagerCfg): configuration</span>
+<span class="sd">            env (DirectMARLEnv): environment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">asset_cfg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="p">:</span> <span class="n">Articulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">scene</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_cfg</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gravity_dir_b</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w_twist</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w_swing</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_root_linvel_t</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">()</span>
+
+        <span class="c1"># sma buffers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qvel</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_vel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qtau</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">applied_torque</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_linvel_t</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_lin_vel_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_angvel_b</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_ang_vel_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+
+        <span class="c1"># TODO: consider applying rotation coning compensation for _root_angvel_b</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_quat_w</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gravity_dir_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">projected_gravity_b</span>
+
+        <span class="c1"># compute linear velocity respect to root&#39;s twist quaternion frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w_twist</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w_swing</span> <span class="o">=</span> <span class="n">twist_swing_decomposition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_root_linvel_t</span> <span class="o">=</span> <span class="n">quat_apply_inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w_twist</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_lin_vel_w</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">()</span>
+
+        <span class="c1"># update sma buffers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qvel</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_vel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qtau</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">applied_torque</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_linvel_t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inst_root_linvel_t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_angvel_b</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_ang_vel_b</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            env_ids (Sequence[int]): Sequence of environment indices to reset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">()</span>
+
+        <span class="c1"># reset sma buffers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qvel</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_vel</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qtau</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">applied_torque</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_linvel_t</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inst_root_linvel_t</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_angvel_b</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_ang_vel_b</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root_quat_w</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identical to `isaaclab.assets.ArticulationData.root_quat_w`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gravity_dir_b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identical to `isaaclab.assets.ArticulationData.projected_gravity_b`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gravity_dir_b</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root_linvel_t</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;SMA of linear velocity which is computed respect to root twist quaternion frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root_linvel_t</span><span class="o">.</span><span class="n">sma</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root_angvel_b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;SMA of `isaaclab.assets.ArticulationData.root_ang_vel_b`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root_angvel_b</span><span class="o">.</span><span class="n">sma</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_qdim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identical to `isaaclab.assets.Articulation.num_joints`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">num_joints</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qpos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identical to `isaaclab.assets.ArticulationData.joint_pos`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_pos</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qvel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;SMA of `isaaclab.assets.ArticulationData.joint_vel`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qvel</span><span class="o">.</span><span class="n">sma</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qtau</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;SMA of `isaaclab.assets.ArticulationData.applied_torque`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qtau</span><span class="o">.</span><span class="n">sma</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qpos_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identical to `isaaclab.assets.ArticulationData.default_joint_pos`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">default_joint_pos</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qvel_default</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identical to `isaaclab.assets.ArticulationData.default_joint_vel`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">default_joint_vel</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qpos_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identical to `isaaclab.assets.ArticulationData.joint_pos_limits`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_pos_limits</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.gravity_dir_b" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">gravity_dir_b</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Identical to <code>isaaclab.assets.ArticulationData.projected_gravity_b</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.n_qdim" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">n_qdim</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Identical to <code>isaaclab.assets.Articulation.num_joints</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.qpos" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">qpos</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Identical to <code>isaaclab.assets.ArticulationData.joint_pos</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.qpos_default" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">qpos_default</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Identical to <code>isaaclab.assets.ArticulationData.default_joint_pos</code></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.qpos_limit" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">qpos_limit</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Identical to <code>isaaclab.assets.ArticulationData.joint_pos_limits</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.qtau" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">qtau</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>SMA of <code>isaaclab.assets.ArticulationData.applied_torque</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.qvel" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">qvel</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>SMA of <code>isaaclab.assets.ArticulationData.joint_vel</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.qvel_default" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">qvel_default</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Identical to <code>isaaclab.assets.ArticulationData.default_joint_vel</code></p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.root_angvel_b" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">root_angvel_b</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>SMA of <code>isaaclab.assets.ArticulationData.root_ang_vel_b</code>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.root_linvel_t" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">root_linvel_t</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>SMA of linear velocity which is computed respect to root twist quaternion frame.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.root_quat_w" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">root_quat_w</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Identical to <code>isaaclab.assets.ArticulationData.root_quat_w</code></p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">env</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialization.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>cfg</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ArticulationDataManagerCfg (bipedal_lab.base.managers.articulation_data_manager.ArticulationDataManagerCfg)" href="#bipedal_lab.base.managers.ArticulationDataManagerCfg">ArticulationDataManagerCfg</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>configuration</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>env</code>
+            </td>
+            <td>
+                  <code><span title="isaaclab.envs.DirectMARLEnv">DirectMARLEnv</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>environment</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/articulation_data_manager.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">ArticulationDataManagerCfg</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">DirectMARLEnv</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialization.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (ArticulationDataManagerCfg): configuration</span>
+<span class="sd">        env (DirectMARLEnv): environment</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">asset_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">asset_cfg</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="p">:</span> <span class="n">Articulation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">scene</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">asset_cfg</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_gravity_dir_b</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w_twist</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_quat_w_swing</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_inst_root_linvel_t</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">()</span>
+
+    <span class="c1"># sma buffers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_qvel</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_vel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_qtau</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">applied_torque</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_linvel_t</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_lin_vel_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_angvel_b</span> <span class="o">=</span> <span class="n">SMABuffer</span><span class="o">.</span><span class="n">init_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_ang_vel_b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_window</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.reset" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Reset.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>env_ids</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<span title="int">int</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sequence of environment indices to reset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/articulation_data_manager.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reset.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        env_ids (Sequence[int]): Sequence of environment indices to reset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">()</span>
+
+    <span class="c1"># reset sma buffers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_qvel</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_vel</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_qtau</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">applied_torque</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_linvel_t</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inst_root_linvel_t</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_angvel_b</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_ang_vel_b</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,:])</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="bipedal_lab.base.managers.ArticulationDataManager.update" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">update</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Update.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/articulation_data_manager.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">()</span>
+
+    <span class="c1"># update sma buffers</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_qvel</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_vel</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_qtau</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">applied_torque</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_linvel_t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inst_root_linvel_t</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_root_angvel_b</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">root_ang_vel_b</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bipedal_lab.base.managers.ArticulationDataManagerCfg" class="doc doc-heading">
+            <code>ArticulationDataManagerCfg</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for <code>ArticulationDataManager</code>.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/articulation_data_manager.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@configclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArticulationDataManagerCfg</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration class for `ArticulationDataManager`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">asset_cfg</span><span class="p">:</span> <span class="n">SceneEntityCfg</span>
+
+    <span class="n">n_window</span><span class="p">:</span> <span class="nb">int</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bipedal_lab.base.managers.ObservationManager" class="doc doc-heading">
+            <code>ObservationManager</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Manager class which computes observation.</p>
+<p>As all observation tensors computed by this manager dont't contain command terms, it must be handled externally.</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Considering the correct implementation of reinforcement learning algorithm, the following quantities are not necessary actually.</p>
+<ul>
+<li>observation(state) of reset environment.</li>
+</ul>
+</details>
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/observation_manager.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ObservationManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manager class which computes observation.</span>
+
+<span class="sd">    As all observation tensors computed by this manager dont&#39;t contain command terms, it must be handled externally.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Considering the correct implementation of reinforcement learning algorithm, the following quantities are not necessary actually.</span>
+
+<span class="sd">        - observation(state) of reset environment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_obs</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Total number of elements in observation (for single time step).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_priv</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Total number of elements in privileged observation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_history</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lenght of history.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_act</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Total number of elements in action.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">obs_t</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Current shep observation tensor with shape of (n_env, n_obs).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">obs_hist</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Observation history tensor with shape of (n_env, n_history, n_obs).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">obsb_hist_n</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Noise added observation history tensor with shape of (n_env, n_history, n_obs).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">obs_priv</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Privileged observation tensor with shape of (n_env, n_priv).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">ObservationManagerCfg</span><span class="p">,</span> <span class="n">adm</span><span class="p">:</span> <span class="n">ArticulationDataManager</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize observation manager.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (ObservationManagerCfg): configuration</span>
+<span class="sd">            adm (ArticulationDataManager): articulation data manager</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span> <span class="o">=</span> <span class="n">adm</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_angvel_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">gravity_dir_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qvel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_act</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_priv</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_linvel_t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_act</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_act</span>
+
+        <span class="c1"># initialize history buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span> <span class="o">=</span> <span class="n">HistoryBuffer</span><span class="p">(</span>
+            <span class="n">n_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">num_envs</span><span class="p">,</span>
+            <span class="n">n_history</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_history</span><span class="p">,</span>
+            <span class="n">n_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># initialize observation tensors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_t</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_n</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_priv</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prev_action</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute observation tensors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prev_action (th.Tensor): action applied on previous step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># observation (single timestep)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_t</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_angvel_b</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">gravity_dir_b</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos_default</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qvel</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qvel_default</span><span class="p">,</span>
+            <span class="n">prev_action</span><span class="p">,</span>
+        <span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># update history buffer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_t</span><span class="p">)</span>
+
+        <span class="c1"># observation history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+
+        <span class="c1"># observation history with noise added</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_n</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># TODO: add observation noise implementation</span>
+
+        <span class="c1"># privileged observation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_priv</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_linvel_t</span>
+        <span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset for given environment indices.</span>
+
+<span class="sd">        This function only reset the history buffer.</span>
+<span class="sd">        Therefore observation tensors `obs_t`, `obs_hist`, `obs_hist_n`, `obs_priv` will not be changed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            env_ids (Sequence[int]): Environment indices for reset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.n_act" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">n_act</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_act</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Total number of elements in action.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.n_history" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">n_history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_history</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Lenght of history.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.n_obs" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">n_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_angvel_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">gravity_dir_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qvel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_act</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Total number of elements in observation (for single time step).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.n_priv" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">n_priv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_linvel_t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Total number of elements in privileged observation.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.obs_hist" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">obs_hist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">buffer</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Observation history tensor with shape of (n_env, n_history, n_obs).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.obs_priv" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">obs_priv</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Privileged observation tensor with shape of (n_env, n_priv).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.obs_t" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">obs_t</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Current shep observation tensor with shape of (n_env, n_obs).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.obsb_hist_n" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">obsb_hist_n</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Noise added observation history tensor with shape of (n_env, n_history, n_obs).</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">adm</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize observation manager.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>cfg</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ObservationManagerCfg (bipedal_lab.base.managers.observation_manager.ObservationManagerCfg)" href="#bipedal_lab.base.managers.ObservationManagerCfg">ObservationManagerCfg</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>configuration</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>adm</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ArticulationDataManager (bipedal_lab.base.managers.articulation_data_manager.ArticulationDataManager)" href="#bipedal_lab.base.managers.ArticulationDataManager">ArticulationDataManager</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>articulation data manager</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/observation_manager.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">ObservationManagerCfg</span><span class="p">,</span> <span class="n">adm</span><span class="p">:</span> <span class="n">ArticulationDataManager</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize observation manager.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (ObservationManagerCfg): configuration</span>
+<span class="sd">        adm (ArticulationDataManager): articulation data manager</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">adm</span> <span class="o">=</span> <span class="n">adm</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_angvel_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">gravity_dir_b</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qvel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_act</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_priv</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_linvel_t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_history</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_act</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_act</span>
+
+    <span class="c1"># initialize history buffer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span> <span class="o">=</span> <span class="n">HistoryBuffer</span><span class="p">(</span>
+        <span class="n">n_env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">num_envs</span><span class="p">,</span>
+        <span class="n">n_history</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_history</span><span class="p">,</span>
+        <span class="n">n_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># initialize observation tensors</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_t</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_obs</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">buffer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_n</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_priv</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.reset" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Reset for given environment indices.</p>
+<p>This function only reset the history buffer.
+Therefore observation tensors <code>obs_t</code>, <code>obs_hist</code>, <code>obs_hist_n</code>, <code>obs_priv</code> will not be changed.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>env_ids</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<span title="int">int</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Environment indices for reset.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/observation_manager.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reset for given environment indices.</span>
+
+<span class="sd">    This function only reset the history buffer.</span>
+<span class="sd">    Therefore observation tensors `obs_t`, `obs_hist`, `obs_hist_n`, `obs_priv` will not be changed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        env_ids (Sequence[int]): Environment indices for reset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="bipedal_lab.base.managers.ObservationManager.update" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">update</span><span class="p">(</span><span class="n">prev_action</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute observation tensors.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>prev_action</code>
+            </td>
+            <td>
+                  <code><span title="torch.Tensor">Tensor</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>action applied on previous step</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/observation_manager.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prev_action</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute observation tensors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prev_action (th.Tensor): action applied on previous step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># observation (single timestep)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_t</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_angvel_b</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">gravity_dir_b</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qpos_default</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qvel</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">qvel_default</span><span class="p">,</span>
+        <span class="n">prev_action</span><span class="p">,</span>
+    <span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># update history buffer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obs_t</span><span class="p">)</span>
+
+    <span class="c1"># observation history</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_buff</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+
+    <span class="c1"># observation history with noise added</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_hist_n</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># TODO: add observation noise implementation</span>
+
+    <span class="c1"># privileged observation</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">obs_priv</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adm</span><span class="o">.</span><span class="n">root_linvel_t</span>
+    <span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bipedal_lab.base.managers.ObservationManagerCfg" class="doc doc-heading">
+            <code>ObservationManagerCfg</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for <code>ObservationManager</code>.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/managers/observation_manager.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@configclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObservationManagerCfg</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration class for `ObservationManager`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_history</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="n">n_act</span><span class="p">:</span> <span class="nb">int</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

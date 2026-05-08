@@ -8,8 +8,10 @@
       
       
       
+        <link rel="canonical" href="https://chanjun-nyam.github.io/Zetin-Humanoid-RL/note/idea/">
       
-        <link rel="prev" href="../bipedal_lab.base.env/">
+      
+        <link rel="prev" href="../todo/">
       
       
       
@@ -21,7 +23,7 @@
     
     
       
-        <title>bipedal_lab.base.reward - Zetin Humanoid RL</title>
+        <title>Idea Note - Zetin Humanoid RL</title>
       
     
     
@@ -44,6 +46,8 @@
       
     
     
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -60,6 +64,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#idea-note" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -93,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              bipedal_lab.base.reward
+              Idea Note
             
           </span>
         </div>
@@ -146,6 +155,18 @@
       
     
     
+      <div class="md-header__source">
+        <a href="https://github.com/chanjun-nyam/Zetin-Humanoid-RL" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Zetin-Humanoid-RL
+  </div>
+</a>
+      </div>
+    
   </nav>
   
 </header>
@@ -179,6 +200,18 @@
     </a>
     Zetin Humanoid RL
   </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chanjun-nyam/Zetin-Humanoid-RL" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Zetin-Humanoid-RL
+  </div>
+</a>
+    </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
     
@@ -432,20 +465,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -466,7 +497,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -484,7 +515,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bipedal_lab.base.env/" class="md-nav__link">
+      <a href="../../api/bipedal_lab.base.env/" class="md-nav__link">
         
   
   
@@ -492,6 +523,174 @@
     
   
     bipedal_lab.base.env
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bipedal_lab.base.managers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.managers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bipedal_lab.base.utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bipedal_lab.base.math_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bipedal_lab.base.math_utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Note
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Note
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../todo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    To-do List
   
 
     
@@ -518,6 +717,26 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Idea Note
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -526,7 +745,7 @@
   <span class="md-ellipsis">
     
   
-    bipedal_lab.base.reward
+    Idea Note
   
 
     
@@ -535,6 +754,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#202655" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026/5/5
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -565,6 +814,27 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#202655" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026/5/5
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -580,10 +850,96 @@
                   
 
 
+  
+  
 
-  <h1>bipedal_lab.base.reward</h1>
 
-
+<h1 id="idea-note">Idea Note</h1>
+<h2 id="202655">2026/5/5</h2>
+<p><strong>latent state 이 가져야할 주요 property</strong></p>
+<ul>
+<li>
+<p>state reconstruction (encoder)</p>
+<ul>
+<li><strong><em>note.</em></strong> we define, state = observation history</li>
+<li>diagonal gaussian + cross entropy</li>
+</ul>
+</li>
+<li>
+<p>next observation reconstruction (forward model)</p>
+<ul>
+<li>diagonal gaussian + cross entropy</li>
+</ul>
+</li>
+<li>
+<p>half periodicity</p>
+<ul>
+<li>full 이 아닌 half periodicty 은 자연스럽게 gait symmetry 도 같이 학습</li>
+<li>
+<p><span class="arithmatex">\(0\leq\Delta t\leq T_\text{half}\)</span>에서 <span class="arithmatex">\(f_\theta(z_{t}, z_{t+\Delta t})\)</span>와 sine wave를 BCE로 fit</p>
+<p>(<span class="arithmatex">\(t\)</span>와 <span class="arithmatex">\(t+\Delta t\)</span>에서 command가 같은 경우만)</p>
+</li>
+<li>
+<p>이러면 command가 0이여도 제자리 걸음을 할 테니 "target_vel 0 + stand" 인 command 를 따로 만들기</p>
+</li>
+<li>일단 period 는 fixed 하고 학습시키기로</li>
+<li>학습 후 period 를 제외한 나머지를 fixed 시키고 최적 period를 조사 (grid search, value func. maximize)</li>
+</ul>
+</li>
+<li>
+<p><strong><em>note.</em></strong> latent state 에 대한 직접적인 metric은 사용 X</p>
+</li>
+</ul>
+<p><strong>command에 따른 difficulty에 대한 고찰</strong></p>
+<p>원래는 cmd vel.이더 높으면 해당 task의 difficulty가 더 높은 것이고 따라서 reward scale에 대한 조정 등이 필요하다고 생각했음.</p>
+<p>그런데 사실 다음의 설계들이 다 적용된다면</p>
+<ul>
+<li>cmd vel.에 따른 periodic reward term들에 대한 weight 조절</li>
+<li>cmd vel.에 따른 energy/momentom penalty의 weight 조절</li>
+</ul>
+<p>해당 모션을 만들기 위해 더 많은 에너지를 사용하는 것이 허용되는 셈이니까 해당 맥락에서는 더 어려운 task 는 아님.
+인간의 직관으로는 더 (에너지 적으로)힘든 일이다 보니 더 어렵다고 보지만, 사실 사용할수 있는 에너지가 더 많아진 상태에서 해당 task의 운동학적 모션을 만들기 더 어려운가 생각해 보면 그렇다고 보기는 어려운듯.</p>
+<p><strong>command design</strong></p>
+<p>사람은 방향을 바꾸거나 속도를 바꿀 경우 바로 그 순간이 아니라 그 전에 먼저 준비를 함.
+이는 무게중심을 변화시킨다던가, 다리 등의 각도를 바꾼다던가 하는 것들이 될 수 있음.
+핵심은 운동의 변화 사전에 준비를 한다는 것임.</p>
+<p>instant command (robot이 blinded 경우)는 이를 반영하지 못함 -&gt; <em>look-ahead/time-horizon command</em></p>
+<p><strong>reward design</strong></p>
+<p>trac lin, trac ang 등을 instant, periodic term 으로 분리해서, cmd vel. 에 따라 interpolate
+energy/momentom penalty 도 cmd vel. 에 따라 rescale</p>
+<p>trac lin, trac ang 계산시 local frame 말고 rollpitch=0 인 frame 사용하기
+(그래야 rollpitch 회전으로 인해 xy 성분 velocity 가 손실되지 않고, additive 성질이 잘 성립함)</p>
+<pre><code>                        inst    periodic (full)
+lin vel track (xy)      T       T
+lin vel pen (z)         T       T
+lin pos pen (z)         T       T
+ang vel track (yaw)     T       T
+ang vel pen (rollpit)   T       T           (xy)
+ang pos pen (rollpit)   T       T           (xy)
+torque * v
+torque^2
+contact
+jnt limit
+delt2 action^2
+foot clearance
+posture (필요할지 나중에 고려)
+nonnegative bias
+warm up reward
+(foot air bonus, when ait percent &lt; eps)
+</code></pre>
+<p><strong>개발 순서</strong></p>
+<ul>
+<li>reward (periodic 포함해서 다) 구현</li>
+<li>일단은 instant, episode에 대해 fixed command</li>
+<li>일단은 representation learning 구현 X</li>
+<li>deploy, 테스트</li>
+<li>representation learning 구현</li>
+<li>time-horizon, episode에서 vaiable command<ul>
+<li>이에 맞춰서 reward, representation learning 수정</li>
+</ul>
+</li>
+<li>inclined 상황을 고려해 reward 다시 설계 및 구현</li>
+</ul>
 
 
 
@@ -637,6 +993,10 @@
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>
