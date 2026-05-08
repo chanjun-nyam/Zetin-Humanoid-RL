@@ -29,6 +29,8 @@ class BipedalEnv(DirectRLEnv):
         pass
     
     def _get_observations(self) -> VecEnvObs:
+        # observation manager
+        # command manager
         pass
     
     def _get_states(self) -> VecEnvObs | None:

@@ -6,9 +6,11 @@ dist/
 wheels/
 *.egg-info
 
-# Virtual environments
-/.venv
+# Python venv
+/.venv/
 
 # runs
 /results/runs/
 
+# mkdocs
+/site/

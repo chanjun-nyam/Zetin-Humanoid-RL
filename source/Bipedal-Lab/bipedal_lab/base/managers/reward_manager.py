@@ -1,11 +1,15 @@
+from isaaclab.assets import Articulation
+from isaaclab.envs import DirectMARLEnv
+from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 
 @configclass
 class RewardManagerCfg:
-    """Configuration class for :class:`~bipedal_lab.base.reward.RewardManager`
+    """Configuration class for `RewardManager`.
     """
-    pass
+
+    asset_cfg: SceneEntityCfg
 
 
 """
@@ -23,11 +27,18 @@ track angular
 
 
 class RewardManager:
-    def __init__(self, cfg: RewardManagerCfg):
-        pass
+    def __init__(self, cfg: RewardManagerCfg, env: DirectMARLEnv):
+        self.cfg = cfg
+        self.env = env
+
+        self.asset_cfg.resolve(self.env.scene)
+
+        self.asset_cfg = self.cfg.asset_cfg
+        self.asset: Articulation = self.env.scene[self.asset_cfg.name]
+
 
     def compute(self):
-        pass
+        self.asset.data
 
 
 # pen lin
@@ -48,15 +59,15 @@ class RewardManager:
 
 # periodical reward term 에는 last period command 의 consistency 를 같이 고려 
 
-# energy: E = int Fv dt
+# mechanical energy: E = int Fv dt
 
-# impulse: J = int F dt
+# head energy: J = int F^2 dt
 
 # stabilize: contact
 
 # stabilize: joint limit
 
-# stabilize: action delta^2
+# stabilize: delta2 action
 
 # stabilize: foot slip
 
@@ -64,4 +75,9 @@ class RewardManager:
 - for time interval (motion period)
 
 # posture: foot clearance
+
+
+
+
+temporal average buffer
 

@@ -1,0 +1,48 @@
+site_name: Zetin Humanoid RL
+site_url: https://chanjun-nyam.github.io/Zetin-Humanoid-RL/
+repo_url: https://github.com/chanjun-nyam/Zetin-Humanoid-RL
+repo_name: Zetin-Humanoid-RL
+
+nav:
+  - Home: index.md
+  - Setup Guide:
+    - Python Environment: setup/python-environment.md
+  - Quick Start: quick-start.md
+  - Concept:
+    - Outline: concept/outline.md
+    - Reward Design: concept/reward-design.md
+  - API Reference:
+    - bipedal_lab.base.env: api/bipedal_lab.base.env.md
+    - bipedal_lab.base.managers: api/bipedal_lab.base.managers.md
+    - bipedal_lab.base.utils: api/bipedal_lab.base.utils.md
+    - bipedal_lab.base.math_utils: api/bipedal_lab.base.math_utils.md
+  - Note:
+    - To-do List: note/todo.md
+    - Idea Note: note/idea.md
+
+theme:
+  name: material
+
+docs_dir: docs
+site_dir: site
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+use_directory_urls: true
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          # global-only options
+          paths:
+            - "./source/"
+          # global/local options
