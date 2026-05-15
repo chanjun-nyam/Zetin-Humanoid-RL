@@ -1,46 +1,40 @@
 from isaaclab.app import AppLauncher
 
-app_launcher = AppLauncher(livestream=2, device='cpu')
+app_launcher = AppLauncher(livestream=2)
 simulation_app = app_launcher.app
 
-from isaaclab.envs import ManagerBasedRLEnv
+from bipedal_lab.env_utils import env_loader
+import bipedal_lab.tasks
 
-from tron_loco.velocity.tron_env import TronEnvCfg, TronEnvCfg_Play
+from bipedal_lab.env_utils import IsaacEnvWrapper
+from tron_loco.velocity.tron_env import TronEnvCfg
+from isaaclab.envs import ManagerBasedRLEnv
 
 import torch as th
 
-import simple_rl
-
-
 def main():
 
-    env = ManagerBasedRLEnv(TronEnvCfg_Play())
+    # env = env_loader.make('Tron1Env')
+    env = IsaacEnvWrapper(ManagerBasedRLEnv(TronEnvCfg()))
 
     print('###########')
-    print(env.action_space)
-    print(env.single_action_space)
-    print(env.action_space.shape)
-    print(env.observation_space)
-    print(env.single_observation_space)
-    print(env.observation_space.shape)
-    print(env.num_envs)
-    print(type(env.device), env.device)
+    print(env.spec)
     print('###########')
 
     obs, info = env.reset()
+    print(obs.shape)
 
     while simulation_app.is_running():
         obs, rwd, ter, tru, info = env.step(
-            th.zeros(env.action_space.shape, device=env.device)
+            th.randn((env.n_env, env.n_action), device=env.device)
         )
-
+        
+        print(obs.shape)
         # print(obs)
         # print(rwd.shape)
         # print(ter.shape)
         # print(tru.shape)
         # print(info)
-
-        print(rwd.mean().item())
 
     env.close()
 

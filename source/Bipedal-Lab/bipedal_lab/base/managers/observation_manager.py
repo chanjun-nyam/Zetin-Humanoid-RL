@@ -1,6 +1,8 @@
 from isaaclab.utils import configclass
 
 from collections.abc import Sequence
+from dataclasses import MISSING
+
 import torch as th
 
 from bipedal_lab.base.utils import HistoryBuffer
@@ -13,21 +15,30 @@ class ObservationManagerCfg:
     """Configuration class for `ObservationManager`.
     """
 
-    n_history: int
+    n_history: int = MISSING
+    """Length of history.
+    """
 
-    n_act: int
+    n_act: int = MISSING
+    """Total number of elements in action vector.
+    """
+
+    n_cmd: int = MISSING
+    """Total number of elements in command vector.
+    """
+
+    obs_scale: list = MISSING
+    """Scaler for each observation terms.
+
+    It requires exactly 7 elements respectively for `root_angvel_b`, `gravity_dir_b`, `qpos`, `qvel`, `action`, `command`, `root_linvel_t`.
+    """
 
 
 
 class ObservationManager:
     """Manager class which computes observation.
 
-    As all observation tensors computed by this manager dont't contain command terms, it must be handled externally.
-
-    Note:
-        Considering the correct implementation of reinforcement learning algorithm, the following quantities are not necessary actually.
-
-        - observation(state) of reset environment.
+    As all observation tensors computed by this manager doesn't contain command term, it must be handled externally.
     """
 
     n_obs: int
@@ -39,11 +50,15 @@ class ObservationManager:
     """
 
     n_history: int
-    """Lenght of history.
+    """Length of history.
     """
 
     n_act: int
-    """Total number of elements in action.
+    """Total number of elements in action vector.
+    """
+
+    n_cmd: int
+    """Total number of elements in action vector.
     """
 
     obs_t: th.Tensor
@@ -73,18 +88,20 @@ class ObservationManager:
         self.cfg = cfg
         self.adm = adm
 
+        self.n_act = self.cfg.n_act
+        self.n_cmd = self.cfg.n_cmd
         self.n_obs = (
             self.adm.root_angvel_b.shape[-1] +
             self.adm.gravity_dir_b.shape[-1] +
             self.adm.qpos.shape[-1] +
             self.adm.qvel.shape[-1] +
-            self.n_act
+            self.n_act +
+            self.n_cmd
         )
         self.n_priv = (
             self.adm.root_linvel_t.shape[-1]
         )
         self.n_history = self.cfg.n_history
-        self.n_act = self.cfg.n_act
 
         # initialize history buffer
         self.obs_hist_buff = HistoryBuffer(
@@ -95,28 +112,50 @@ class ObservationManager:
             dtype=self.adm.qpos.dtype,
         )
 
-        # initialize observation tensors
-        self.obs_t = th.zeros(size=(self.n_env, self.n_obs), device=self.device)
-        self.obs_hist = self.obs_hist_buff.buffer
+        # access to observation tensor before any update call is undefined behavior
+        self.obs_t = None
+        self.obs_hist = None
         self.obs_hist_n = None
-        self.obs_priv
+        self.obs_priv = None
+
+        from bipedal_lab.utils.tensor_debugger import TensorDebugger
+        self.tensor_dbgr = TensorDebugger(rng=(-10,10))
 
 
-    def update(self, prev_action: th.Tensor):
+    def update(self, action: th.Tensor, command: th.Tensor):
         """Compute observation tensors.
 
         Args:
-            prev_action (th.Tensor): action applied on previous step
+            action (th.Tensor): action applied on previous step
+            command (th.Tensor): command tensor
         """
         # observation (single timestep)
         self.obs_t = th.cat([
-            self.adm.root_angvel_b,
-            self.adm.gravity_dir_b,
-            self.adm.qpos - self.adm.qpos_default,
-            self.adm.qvel - self.adm.qvel_default,
-            prev_action,
+            (self.adm.root_angvel_b) * self.cfg.obs_scale[0],
+            (self.adm.gravity_dir_b) * self.cfg.obs_scale[1],
+            (self.adm.qpos - self.adm.qpos_default) * self.cfg.obs_scale[2],
+            (self.adm.qvel - self.adm.qvel_default) * self.cfg.obs_scale[3],
+            (action) * self.cfg.obs_scale[4],
+            (command) * self.cfg.obs_scale[5],
         ], dim=-1)
-
+        # TODO: change adm.root_angvel_b to twist angvel and swing angvel
+        if not self.tensor_dbgr.is_safe(self.obs_t):
+            print('not safe tensor element fount!!!!!!!!!!!!!!!!!!!!!!!!!!!!! (observation)')
+            print(
+                self.tensor_dbgr.is_safe(self.adm.root_angvel_b * self.cfg.obs_scale[0]),
+                self.tensor_dbgr.is_safe(self.adm.gravity_dir_b * self.cfg.obs_scale[1]),
+                self.tensor_dbgr.is_safe((self.adm.qpos - self.adm.qpos_default) * self.cfg.obs_scale[2]),
+                self.tensor_dbgr.is_safe((self.adm.qvel - self.adm.qvel_default) * self.cfg.obs_scale[3]),
+                self.tensor_dbgr.is_safe(action * self.cfg.obs_scale[4]),
+                self.tensor_dbgr.is_safe(command * self.cfg.obs_scale[5]),
+            )
+            print(
+                self.obs_t.isnan().any().item(),
+                self.obs_t.isinf().any().item(),
+                self.obs_t.min().item(),
+                self.obs_t.max().item(),
+            )
+            self.tensor_dbgr.autofill(self.obs_t, val=0.0)
         # update history buffer
         self.obs_hist_buff.update(self.obs_t)
 
@@ -129,7 +168,7 @@ class ObservationManager:
 
         # privileged observation
         self.obs_priv = th.cat([
-            self.adm.root_linvel_t
+            self.adm.root_linvel_t * self.cfg.obs_scale[6]
         ], dim=-1)
     
 

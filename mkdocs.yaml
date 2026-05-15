@@ -12,10 +12,19 @@ nav:
     - Outline: concept/outline.md
     - Reward Design: concept/reward-design.md
   - API Reference:
-    - bipedal_lab.base.env: api/bipedal_lab.base.env.md
-    - bipedal_lab.base.managers: api/bipedal_lab.base.managers.md
-    - bipedal_lab.base.utils: api/bipedal_lab.base.utils.md
-    - bipedal_lab.base.math_utils: api/bipedal_lab.base.math_utils.md
+    - bipedal_lab:
+      - base.managers:
+        - action_manager:             api/bipedal_lab/base.managers/action_manager.md
+        - articulation_data_manager:  api/bipedal_lab/base.managers/articulation_data_manager.md
+        - command_manager:            api/bipedal_lab/base.managers/command_manager.md
+        - observation_manager:        api/bipedal_lab/base.managers/observation_manager.md
+        - randomize_manager:          api/bipedal_lab/base.managers/randomize_manager.md
+        - reward_manager:             api/bipedal_lab/base.managers/reward_manager.md
+        - termination_manager:        api/bipedal_lab/base.managers/termination_manager.md
+      - base.env_cfg:                 api/bipedal_lab/base.env_cfg.md
+      - base.env:                     api/bipedal_lab/base.env.md
+      - base.math_utils:              api/bipedal_lab/base.math_utils.md
+      - base.utils:                   api/bipedal_lab/base.utils.md
   - Note:
     - To-do List: note/todo.md
     - Idea Note: note/idea.md

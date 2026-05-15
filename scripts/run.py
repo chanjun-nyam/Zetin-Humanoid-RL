@@ -3,33 +3,28 @@ from isaaclab.app import AppLauncher
 app_launcher = AppLauncher(livestream=2)
 simulation_app = app_launcher.app
 
-# RUN_MODE = 'train'
-RUN_MODE = 'play'
+RUN_MODE = 'train'
+# RUN_MODE = 'play'
 # RUN_MODE = 'test'
 
-ENV_NAME = 'TronEnv' if RUN_MODE == 'train' else 'TronEnv_Play'
+ENV_NAME = 'Tron1Env'
 RUN_PATH = 'results/runs'
 MODEL_PATH = 'results/models/model.pt'
-# STOCHASTIC = True
-STOCHASTIC = False
+STOCHASTIC = True
+# STOCHASTIC = False
 
 from simple_rl.runner import PPORunner
 from simple_rl.algorithms.ppo import PPO, PPOCfg
 from simple_rl.modules.modules import MlpActorCritic
 
-from scripts.utils import env_loader
-from scripts.utils.env_wrapper import IsaacEnvWrapper
+import bipedal_lab.tasks
+from bipedal_lab.env_utils import env_loader
+
 import torch as th
 
 
 def main():
     env = env_loader.make(ENV_NAME)
-    env = IsaacEnvWrapper(
-        isaac_env=env,
-        reward_mean_min=0.0,
-        reward_scale=(1/env.step_dt),
-        info_scale=(1/env.step_dt)*env.max_episode_length_s/env.max_episode_length,
-    )
 
     actor_critic = MlpActorCritic(
         n_obs=env.n_obs,

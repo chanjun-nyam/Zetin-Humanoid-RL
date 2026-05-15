@@ -1,15 +1,19 @@
 from isaaclab.assets import Articulation
-from isaaclab.envs import DirectMARLEnv
+from isaaclab.envs import DirectRLEnv
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 from collections.abc import Sequence
+from dataclasses import MISSING
+
 import torch as th
 
 from bipedal_lab.base.utils import SMABuffer
 from bipedal_lab.base.math_utils import (
-    twist_swing_decomposition,
-    quat_apply_inv,
+    quat_apply,
+    quat_mul,
+    quat_conj,
+    quat_twist,
 )
 
 
@@ -19,9 +23,15 @@ class ArticulationDataManagerCfg:
     """Configuration class for `ArticulationDataManager`.
     """
 
-    asset_cfg: SceneEntityCfg
+    asset_cfg: SceneEntityCfg = MISSING
+    """`SceneEntityCfg` for `Articulation`.
 
-    n_window: int
+    Actually only name of it is necessary.
+    """
+
+    n_window: int = MISSING
+    """Size of the SMA buffer window.
+    """
 
 
 
@@ -30,24 +40,26 @@ class ArticulationDataManager:
     """
 
 
-    def __init__(self, cfg: ArticulationDataManagerCfg, env: DirectMARLEnv):
+    def __init__(self, cfg: ArticulationDataManagerCfg, env: DirectRLEnv):
         """Initialization.
 
         Args:
             cfg (ArticulationDataManagerCfg): configuration
-            env (DirectMARLEnv): environment
+            env (DirectRLEnv): environment
         """
         self.cfg = cfg
         self.env = env
 
-        self.asset_cfg = self.cfg.asset_cfg
-        self.asset: Articulation = self.env.scene[self.asset_cfg.name]
+        self.asset: Articulation = self.env.scene[self.cfg.asset_cfg.name]
+
+        self.VEC3_Z = th.zeros_like(self.asset.data.root_pos_w)
+        self.VEC3_Z[:,2] = 1.0
 
         self._root_quat_w: th.Tensor
         self._gravity_dir_b: th.Tensor
-        self._root_quat_w_twist: th.Tensor
-        self._root_quat_w_swing: th.Tensor
-        self._inst_root_linvel_t: th.Tensor
+        self._twist_quat: th.Tensor
+        self._swing_quat: th.Tensor
+        self._inst_twist_linvel: th.Tensor
         self._compute()
 
         # sma buffers
@@ -58,18 +70,29 @@ class ArticulationDataManager:
 
         # TODO: consider applying rotation coning compensation for _root_angvel_b
 
+        print('articulation data manager ||||||||||||||||||||||||||')
+        print(self.asset.joint_names)
+
 
     def _compute(self):
         self._root_quat_w = self.asset.data.root_quat_w
         self._gravity_dir_b = self.asset.data.projected_gravity_b
 
-        # compute linear velocity respect to root's twist quaternion frame
-        self._root_quat_w_twist, self._root_quat_w_swing = twist_swing_decomposition(self._root_quat_w)
-        self._inst_root_linvel_t = quat_apply_inv(self._root_quat_w_twist, self.asset.data.root_lin_vel_w)
+        # twist-swing decomposition
+        self._twist_quat = quat_twist(self._root_quat_w, self.VEC3_Z)
+        self._swing_quat = quat_mul(quat_conj(self._twist_quat), self._root_quat_w)
+        
+        # instantanious linear velocity in twist quaternion frame
+        self._inst_root_linvel_t = quat_apply(quat_conj(self._twist_quat), self.asset.data.root_lin_vel_w)
+
+        # TODO: angular velocity of twist quaternion
     
 
     def update(self):
         """Update.
+
+        Note:
+            This function should be called at the simulation cycle, not the policy cycle.
         """
         self._compute()
 
@@ -103,6 +126,23 @@ class ArticulationDataManager:
     
 
     @property
+    def twist_quat(self):
+        """Twist quaternion of `root_quat_w`.
+        """
+        return self._twist_quat
+    
+
+    @property
+    def swing_quat(self):
+        """Swing quaternion of `root_quat_w`.
+
+        Note:
+            Decomposition order is twist-swing.
+        """
+        return self._swing_quat
+    
+
+    @property
     def gravity_dir_b(self):
         """Identical to `isaaclab.assets.ArticulationData.projected_gravity_b`.
         """
@@ -111,7 +151,7 @@ class ArticulationDataManager:
 
     @property
     def root_linvel_t(self):
-        """SMA of linear velocity which is computed respect to root twist quaternion frame.
+        """SMA of root's linear velocity in twist quaternion frame.
         """
         return self._root_linvel_t.sma
     
@@ -163,10 +203,3 @@ class ArticulationDataManager:
         """Identical to `isaaclab.assets.ArticulationData.default_joint_vel`
         """
         return self.asset.data.default_joint_vel
-    
-
-    @property
-    def qpos_limit(self):
-        """Identical to `isaaclab.assets.ArticulationData.joint_pos_limits`.
-        """
-        return self.asset.data.joint_pos_limits

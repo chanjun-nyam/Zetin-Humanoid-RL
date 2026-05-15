@@ -1,21 +1,54 @@
+from isaaclab.managers import SceneEntityCfg
+from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sim import SimulationCfg
 from isaaclab.envs import DirectRLEnvCfg
 from isaaclab.utils import configclass
 
+from dataclasses import MISSING
+from typing import List
 
-SIM_DT = 1/200
-POLICY_DT = 1/50
-DECIMATION = 4
+from bipedal_lab.base.managers import (
+    ActionManagerCfg,
+    ArticulationDataManagerCfg,
+    ObservationManagerCfg,
+    RewardManagerCfg,
+    TerminationManagerCfg,
+)
+
 
 
 @configclass
 class BipedalEnvCfg(DirectRLEnvCfg):
-    """Configuration class for :class:`~bipedal_lab.base.env.BipedalEnv`.
+    """Configuration class for `BipedalEnv`.
     """
 
-    sim = SimulationCfg(
-        device=None,
-        dt=SIM_DT,
-        render_interval=DECIMATION,
-        physx
-    )
+    # config terms derived from `DirectRLEnv`
+    # only required fields are rewritten
+
+    sim: SimulationCfg = MISSING
+
+    decimation: int = MISSING
+
+    episode_length_s: float = MISSING
+
+    scene: InteractiveSceneCfg = MISSING
+
+    action_space: int = MISSING
+
+    observation_space: int = MISSING
+
+    # config terms derived from `BipedalEnv`
+
+    action_scale: float | List[float] = MISSING
+
+    robot_cfg: SceneEntityCfg = MISSING
+
+    adm_cfg: ArticulationDataManagerCfg = MISSING
+
+    act_cfg: ActionManagerCfg = MISSING
+
+    obs_cfg: ObservationManagerCfg = MISSING
+
+    rwd_cfg: RewardManagerCfg = MISSING
+
+    ter_cfg: TerminationManagerCfg = MISSING

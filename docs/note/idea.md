@@ -72,7 +72,7 @@ delt2 action^2
 foot clearance
 posture (필요할지 나중에 고려)
 nonnegative bias
-warm up reward
+warm up reward (필요할지 나중에 고려)
 (foot air bonus, when ait percent < eps)
 ```
 

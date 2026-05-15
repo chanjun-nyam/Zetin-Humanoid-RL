@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from isaaclab.envs import DirectRLEnv, VecEnvStepReturn
 
 from collections.abc import Sequence
-from __future__ import annotations
 
 import torch as th
 
@@ -178,6 +179,10 @@ class SMABuffer:
         if self.ptr == 0:
             self.sma[:,:] = self.sma2[:,:]
             self.sma2[:,:] = 0
+
+
+        # TODO
+        self.sma[:,:] = data
 
 
     def reset(self, env_ids: Sequence[int], value: th.Tensor = 0):
