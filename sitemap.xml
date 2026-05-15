@@ -2,46 +2,74 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
          <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/quick-start/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
-         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab.base.env/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.env/</loc>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
-         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab.base.managers/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.env_cfg/</loc>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
-         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab.base.math_utils/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.math_utils/</loc>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
-         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab.base.utils/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.utils/</loc>
+         <lastmod>2026-05-15</lastmod>
+    </url>
+    <url>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.managers/action_manager/</loc>
+         <lastmod>2026-05-15</lastmod>
+    </url>
+    <url>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.managers/articulation_data_manager/</loc>
+         <lastmod>2026-05-15</lastmod>
+    </url>
+    <url>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.managers/command_manager/</loc>
+         <lastmod>2026-05-15</lastmod>
+    </url>
+    <url>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.managers/observation_manager/</loc>
+         <lastmod>2026-05-15</lastmod>
+    </url>
+    <url>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.managers/randomize_manager/</loc>
+         <lastmod>2026-05-15</lastmod>
+    </url>
+    <url>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.managers/reward_manager/</loc>
+         <lastmod>2026-05-15</lastmod>
+    </url>
+    <url>
+         <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.managers/termination_manager/</loc>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
          <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/concept/outline/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
          <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/concept/reward-design/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
          <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/note/idea/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
          <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/note/todo/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <lastmod>2026-05-15</lastmod>
     </url>
     <url>
          <loc>https://chanjun-nyam.github.io/Zetin-Humanoid-RL/setup/python-environment/</loc>
-         <lastmod>2026-05-08</lastmod>
+         <lastmod>2026-05-15</lastmod>
     </url>
 </urlset>

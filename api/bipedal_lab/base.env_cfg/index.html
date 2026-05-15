@@ -8,28 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://chanjun-nyam.github.io/Zetin-Humanoid-RL/setup/python-environment/">
+        <link rel="canonical" href="https://chanjun-nyam.github.io/Zetin-Humanoid-RL/api/bipedal_lab/base.env_cfg/">
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../base.managers/termination_manager/">
       
       
-        <link rel="next" href="../../quick-start/">
+        <link rel="next" href="../base.env/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Python Environment - Zetin Humanoid RL</title>
+        <title>base.env_cfg - Zetin Humanoid RL</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -48,9 +48,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#setup-manual" class="md-skip">
+        <a href="#bipedal_lab.base.env_cfg" class="md-skip">
           Skip to content
         </a>
       
@@ -84,7 +84,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Zetin Humanoid RL" class="md-header__button md-logo" aria-label="Zetin Humanoid RL" data-md-component="logo">
+    <a href="../../.." title="Zetin Humanoid RL" class="md-header__button md-logo" aria-label="Zetin Humanoid RL" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Python Environment
+              base.env_cfg
             
           </span>
         </div>
@@ -194,7 +194,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Zetin Humanoid RL" class="md-nav__button md-logo" aria-label="Zetin Humanoid RL" data-md-component="logo">
+    <a href="../../.." title="Zetin Humanoid RL" class="md-nav__button md-logo" aria-label="Zetin Humanoid RL" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -224,7 +224,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -248,20 +248,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -282,7 +280,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -297,37 +295,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Python Environment
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../setup/python-environment/" class="md-nav__link">
         
   
   
@@ -343,59 +314,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#python-environment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Python environment
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#visual-studio-code-workspace" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visual Studio Code workspace
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -415,7 +333,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../quick-start/" class="md-nav__link">
+      <a href="../../../quick-start/" class="md-nav__link">
         
   
   
@@ -489,7 +407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../concept/outline/" class="md-nav__link">
+      <a href="../../../concept/outline/" class="md-nav__link">
         
   
   
@@ -517,7 +435,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../concept/reward-design/" class="md-nav__link">
+      <a href="../../../concept/reward-design/" class="md-nav__link">
         
   
   
@@ -549,18 +467,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -581,7 +501,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -596,18 +516,20 @@
                 
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" checked>
         
           
           <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
@@ -628,7 +550,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -693,7 +615,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.managers/action_manager/" class="md-nav__link">
+      <a href="../base.managers/action_manager/" class="md-nav__link">
         
   
   
@@ -721,7 +643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.managers/articulation_data_manager/" class="md-nav__link">
+      <a href="../base.managers/articulation_data_manager/" class="md-nav__link">
         
   
   
@@ -749,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.managers/command_manager/" class="md-nav__link">
+      <a href="../base.managers/command_manager/" class="md-nav__link">
         
   
   
@@ -777,7 +699,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.managers/observation_manager/" class="md-nav__link">
+      <a href="../base.managers/observation_manager/" class="md-nav__link">
         
   
   
@@ -805,7 +727,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.managers/randomize_manager/" class="md-nav__link">
+      <a href="../base.managers/randomize_manager/" class="md-nav__link">
         
   
   
@@ -833,7 +755,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.managers/reward_manager/" class="md-nav__link">
+      <a href="../base.managers/reward_manager/" class="md-nav__link">
         
   
   
@@ -861,7 +783,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.managers/termination_manager/" class="md-nav__link">
+      <a href="../base.managers/termination_manager/" class="md-nav__link">
         
   
   
@@ -894,10 +816,35 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.env_cfg/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    base.env_cfg
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -913,6 +860,46 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.env_cfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        env_cfg
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bipedal_lab.base.env_cfg.BipedalEnvCfg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BipedalEnvCfg
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -925,7 +912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.env/" class="md-nav__link">
+      <a href="../base.env/" class="md-nav__link">
         
   
   
@@ -953,7 +940,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.math_utils/" class="md-nav__link">
+      <a href="../base.math_utils/" class="md-nav__link">
         
   
   
@@ -981,7 +968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/bipedal_lab/base.utils/" class="md-nav__link">
+      <a href="../base.utils/" class="md-nav__link">
         
   
   
@@ -1071,7 +1058,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../note/todo/" class="md-nav__link">
+      <a href="../../../note/todo/" class="md-nav__link">
         
   
   
@@ -1099,7 +1086,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../note/idea/" class="md-nav__link">
+      <a href="../../../note/idea/" class="md-nav__link">
         
   
   
@@ -1144,8 +1131,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1154,10 +1139,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
+  <a href="#bipedal_lab.base.env_cfg" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Requirements
+        env_cfg
       
     </span>
   </a>
@@ -1165,21 +1150,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-environment" class="md-nav__link">
+  <a href="#bipedal_lab.base.env_cfg.BipedalEnvCfg" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python environment
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#visual-studio-code-workspace" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visual Studio Code workspace
+        BipedalEnvCfg
       
     </span>
   </a>
@@ -1206,43 +1180,163 @@
   
 
 
-<h1 id="setup-manual">Setup Manual</h1>
-<h2 id="requirements">Requirements</h2>
-<ul>
-<li><a href="https://github.com/isaac-sim">Isaac Sim 5.1.0</a></li>
-<li><a href="https://github.com/isaac-sim/IsaacLab">Isaac Lab 2.3.2</a></li>
-<li><a href="https://github.com/astral-sh/uv">uv</a> (we assume using uv for python package manager)</li>
-</ul>
-<h2 id="python-environment">Python environment</h2>
-<pre><code class="language-Bash"># modify to directory where your isaaclab is installed
-ISAACLAB_PTH=&quot;/home/chanjun/workspace/NVIDIA-Omniverse/IsaacLab&quot;
+  <h1>base.env_cfg</h1>
 
-# create python venv
-uv sync
+<div class="doc doc-object doc-module">
 
-# install isaaclab packages
-source ./.venv/bin/activate
-&quot;${ISAACLAB_PTH}/isaaclab.sh&quot; --install
-deactivate
 
-# reinforcement learning environment which we implemented
-uv pip install -e ./source/Bipedal-Lab
 
-# reinforcement learning library
-uv pip install git+https://github.com/chanjun-nyam/Simple-RL.git
+<a id="bipedal_lab.base.env_cfg"></a>
+    <div class="doc doc-contents first">
 
-# NVIDIA-GPU monitoring tool
-uv pip install nvitop
 
-# setup isaacsim packages (this must be run for every new terminal)
-source ./load_isaacsim_package.sh
-</code></pre>
-<pre><code>uv pip install mkdocs mkdocs-material &quot;mkdocstrings[python]&quot;
-uv pip install pymdown-extensions
-</code></pre>
-<h2 id="visual-studio-code-workspace">Visual Studio Code workspace</h2>
-<pre><code class="language-Bash">TODO
-</code></pre>
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="bipedal_lab.base.env_cfg.BipedalEnvCfg" class="doc doc-heading">
+            <code>BipedalEnvCfg</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="isaaclab.envs.DirectRLEnvCfg">DirectRLEnvCfg</span></code></p>
+
+
+
+        <p>Configuration class for <code>BipedalEnv</code>.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>source/Bipedal-Lab/bipedal_lab/base/env_cfg.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@configclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BipedalEnvCfg</span><span class="p">(</span><span class="n">DirectRLEnvCfg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration class for `BipedalEnv`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># config terms derived from `DirectRLEnv`</span>
+    <span class="c1"># only required fields are rewritten</span>
+
+    <span class="n">sim</span><span class="p">:</span> <span class="n">SimulationCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">decimation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">episode_length_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">scene</span><span class="p">:</span> <span class="n">InteractiveSceneCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">action_space</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">observation_space</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="c1"># config terms derived from `BipedalEnv`</span>
+
+    <span class="n">action_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">robot_cfg</span><span class="p">:</span> <span class="n">SceneEntityCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">adm_cfg</span><span class="p">:</span> <span class="n">ArticulationDataManagerCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">act_cfg</span><span class="p">:</span> <span class="n">ActionManagerCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">obs_cfg</span><span class="p">:</span> <span class="n">ObservationManagerCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">rwd_cfg</span><span class="p">:</span> <span class="n">RewardManagerCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+
+    <span class="n">ter_cfg</span><span class="p">:</span> <span class="n">TerminationManagerCfg</span> <span class="o">=</span> <span class="n">MISSING</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
@@ -1292,12 +1386,12 @@ uv pip install pymdown-extensions
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../javascripts/mathjax.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
