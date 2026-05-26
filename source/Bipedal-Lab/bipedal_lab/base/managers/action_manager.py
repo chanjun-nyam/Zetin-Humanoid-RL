@@ -4,6 +4,7 @@ from isaaclab.utils import configclass
 from collections.abc import Sequence
 from dataclasses import MISSING
 
+import gymnasium.spaces as spaces
 import torch as th
 
 
@@ -14,13 +15,13 @@ class ActionManagerCfg:
     """
 
     min_delayed_steps: int = MISSING
-    """Minimum step count of being action delayed."""
+    """Minimum step count of action being delayed."""
 
     max_delayed_steps: int = MISSING
-    """Maximum step count of being action delayed.
+    """Maximum step count of action being delayed.
 
     Note:
-        It must be less or equal than `decimation` of environment.
+        It must be less or equal than `decimation` of the environment.
     """
 
 
@@ -29,115 +30,135 @@ class ActionManager:
     """Manager class which tracks some useful quantities related to action.
     """
 
-    act: th.Tensor
-    """Action tensor with shape (n_env, n_act).
-    """
 
-    d_act: th.Tensor
-    """First forward difference of action tensor with shape (n_env, n_act).
-    """
-
-    d2_act: th.Tensor
-    """Second forward difference of action tensor with shape (n_env, n_act).
-    """
-
-    act_delayed: th.Tensor
-    """Delayed action tensor with shape (n_env, n_act).
-    """
-
-    
     def __init__(self, cfg: ActionManagerCfg, env: DirectRLEnv):
-        """Initialize manager.
+        """Initialize the manager.
+
+        Args:
+            cfg (ActionManagerCfg): Configuration instance for the manager.
+            env (DirectRLEnv): Environment instance.
+        Raises:
+            ValueError: When `single_action_space` of environment is not a single vector space.
         """
         self.cfg = cfg
         self.env = env
 
-        self.n_env = env.num_envs
-        self.n_act = env.action_space.shape[-1]
+        if not (
+            isinstance(env.single_action_space, spaces.Box) and
+            len(env.single_action_space.shape) == 1
+        ):
+            raise ValueError('Only single vector action space is supported.')
         
+        self.n_env = env.num_envs
+        self.n_act = env.single_action_space.shape[-1]
+
         dummy_act = th.zeros(
             size=(self.n_env, self.n_act),
             dtype=th.float32,
-            device=env.device
+            device=env.device,
         )
 
-        # initialize action tensors
-        self.act = dummy_act.clone()
-        self.d_act = dummy_act.clone()
-        self.d2_act = dummy_act.clone()
-        self.prev_act = dummy_act.clone()
-        self.prev_d_act = dummy_act.clone()
-        self.act_delayed = dummy_act.clone()
+        # source tensors for defensive copying
+        self.ACT_DIFF_ORD = 2 # we don't need higher order
+        self._act_diff = [
+            th.zeros(
+                size=(self.n_env, self.ACT_DIFF_ORD + 1 - i, self.n_act),
+                dtype=th.float32,
+                device=env.device,
+            ) for i in range(self.ACT_DIFF_ORD + 1)
+            # self._act_diff[i][:,j,:]: j-th previous i-th order difference action tensor
+        ]
+        
+        self._act_delayed = th.zeros_like(dummy_act)
         
         # initialize delay table
         self.delay_table = th.randint_like(
-            input=self.act[:,0],
+            input=self._act_delayed[:,0],
             low=self.cfg.min_delayed_steps,
             high=self.cfg.max_delayed_steps+1,
             dtype=th.int64,
         )
-        self.since_update_action = None
+        self.since_update_action = 0
 
-        from bipedal_lab.utils.tensor_debugger import TensorDebugger
-        self.tensor_dbgr = TensorDebugger(rng=(-10,10))
-    
 
     def update_action(self, action: th.Tensor):
-        """Update action.
+        """Update new action.
 
         Args:
-            action (th.Tensor): Action tensor with shape (n_env, n_act).
+            action (th.Tensor): Action tensor. Shape is (n_env, n_act).
         """
-        if not self.tensor_dbgr.is_safe(action):
-            print('Anot safe tensor element fount!!!!!!!!!!!!!!!!!!!!!!!!!!!!! (action)')
-            action_safe = self.tensor_dbgr._to_safe(action, self.tensor_dbgr.cond)
-            print(action_safe.logical_not().sum(dim=0))
-            print(action.abs().max(dim=0))
-            print(action.mean(dim=0))
-            print(action.std(dim=0))
-            # self.tensor_dbgr.autofill(action, val=0.0)
-        self.prev_act = self.act
-        self.act = action
-        
-        self.prev_d_act = self.d_act
-        self.d_act = self.act - self.prev_act
-
-        self.d2_act = self.d_act - self.prev_d_act
-
+        # update difference action tensor table
+        for i in range(self.ACT_DIFF_ORD + 1):
+            self._act_diff[i].copy_(self._act_diff[i].roll(shifts=1, dims=1))
+            self._act_diff[i][:,0,:] = (
+                self._act_diff[i-1][:,0,:] - self._act_diff[i-1][:,1,:]
+                if i >= 1 else
+                action
+            )
         # reset counter
         self.since_update_action = 0
-    
+
 
     def update(self):
-        """Update `act_delayed` variable.
+        """Update delayed action tensor.
 
         Note:
             This function should be called at the simulation cycle, not the policy cycle.
         """
-        self.act_delayed = th.where(
-            condition=self.delay_table.unsqueeze(-1)<=self.since_update_action,
-            input=self.act,
-            other=self.prev_act,
-        )
+        is_current = self.delay_table <= self.since_update_action
+        self._act_delayed.copy_(th.where(
+            condition=is_current.unsqueeze(-1),
+            input=self._act_diff[0][:,0,:], # current action
+            other=self._act_diff[0][:,1,:], # previous action
+        ))
         self.since_update_action += 1
-    
+
 
     def reset(self, env_ids: Sequence[int]):
-        """Reset for given environments.
+        """Reset the manager.
 
         Args:
             env_ids (Sequence[int]): Environment indices to reset.
         """
-        self.act[env_ids,:] = 0
-        self.d_act[env_ids,:] = 0
-        self.d2_act[env_ids,:] = 0
-        self.prev_act[env_ids,:] = 0
-        self.prev_d_act[env_ids,:] = 0
-        self.act_delayed[env_ids,:] = 0
-
+        # reset action difference tensors
+        for i in range(self.ACT_DIFF_ORD + 1):
+            self._act_diff[i][env_ids,:,:] = 0
+        # reset delayed action tensor
+        self._act_delayed[env_ids,:] = 0
+        # reset delay table
         self.delay_table[env_ids] = th.randint_like(
-            input=self.act[env_ids,0],
+            input=self._act_delayed[env_ids,0],
             low=self.cfg.min_delayed_steps,
             high=self.cfg.max_delayed_steps+1,
             dtype=th.int64,
         )
+
+
+    @property
+    def act(self):
+        """Action tensor. Shape is (n_env, n_act).
+        """
+        return self._act_diff[0][:,0,:].clone()
+    
+
+    @property
+    def act_delayed(self):
+        """Delayed action tensor. Shape is (n_env, n_act).
+        """
+        return self._act_delayed.clone()
+    
+
+    def act_diff(self, o: int, t: int = 0):
+        """`t`-th previous `o`-th order action difference tensor. Shape is (n_env, n_act).
+
+        Args:
+            o (int): Order of action difference.
+            t (int, optional): Number of previous steps of action difference. Defaults to 0.
+
+        Note that `o` and `t` must satifies the following condition:
+
+        - 0 <= `o` <= `ACT_DIFF_ORD` = 2
+        - 0 <= `t` <= `ACT_DIFF_ORD` = 2
+        - `o` + `t` <= `ACT_DIFF_ORD` = 2
+        """
+        return self._act_diff[o][:,t,:].clone()

@@ -10,9 +10,9 @@ from bipedal_lab.base.env_cfg import BipedalEnvCfg
 from bipedal_lab.base.utils import direct_rl_env_extended_step
 from bipedal_lab.base.managers import (
     ActionManager,
-    ArticulationDataManager,
     ObservationManager,
     RewardManager,
+    RobotDataManager,
     TerminationManager,
 )
 
@@ -50,10 +50,10 @@ class BipedalEnv(DirectRLEnv):
         self.n_obs = self.cfg.observation_space
         
         # initialize managers
-        self.adm = ArticulationDataManager(self.cfg.adm_cfg, self)
+        self.rdm = RobotDataManager(self.cfg.rdm_cfg, self)
         self.act_mgr = ActionManager(self.cfg.act_cfg, self)
-        self.obs_mgr = ObservationManager(self.cfg.obs_cfg, self.adm)
-        self.rwd_mgr = RewardManager(self.cfg.rwd_cfg, self.adm, self.act_mgr)
+        self.obs_mgr = ObservationManager(self.cfg.obs_cfg, self.rdm)
+        self.rwd_mgr = RewardManager(self.cfg.rwd_cfg, self, self.rdm)
         self.ter_mgr = TerminationManager(self.cfg.ter_cfg, self)
 
         # TODO: temporary implementation of command
@@ -69,6 +69,57 @@ class BipedalEnv(DirectRLEnv):
     def _setup_scene(self):
         self.robot: Articulation = self.scene[self.cfg.robot_cfg.name]
 
+
+    def _pre_physics_step(self, action: th.Tensor):
+        # update action manager
+        self.act_mgr.update_action(action)
+
+        # update command manager
+        # command resample TODO: temporary implementation
+        resample_ids = (self.episode_length_buf % 300 == 0).nonzero(as_tuple=False).squeeze(-1)
+        self.command[resample_ids,:] = th.rand(resample_ids.shape[0], 3, dtype=th.float32, device=self.device) * 2 - 1
+
+        # clear step info dictionary
+        self.step_info = {}
+
+        self.physics_step_cnt_ = 0
+
+
+    def _apply_action(self):
+        # update delayed action
+        self.act_mgr.update()
+
+        # compute setpoint
+        setpoint = self.rdm.qpos_default + self.act_mgr.act_delayed * self.act_scale
+
+        # set setpoint of pd-controller for joints
+        self.robot.set_joint_position_target(setpoint)
+
+
+    def _post_apply_action(self):
+        self.rdm.update(self.physics_step_cnt_ == 3)
+        self.physics_step_cnt_ += 1
+
+
+    def _get_dones(self) -> Tuple[th.Tensor, th.Tensor]:
+        # update termination manager
+        self.ter_mgr.update()
+        # update done info
+        self.step_info['done'] = self.ter_mgr.info
+        return (
+            self.ter_mgr.terminated,
+            self.ter_mgr.truncated,
+        )
+    
+
+    def _get_rewards(self) -> th.Tensor:
+        # update reward manager
+        self.rwd_mgr.update(self.command, self.act_mgr.act_diff(o=1), self.act_mgr.act_diff(o=2), self.ter_mgr.terminated)
+        # update reward info
+        self.step_info['reward'] = self.rwd_mgr.info
+        
+        return self.rwd_mgr.reward
+    
     
     def _reset_idx(self, env_ids: Sequence[int]):
         super()._reset_idx(env_ids)
@@ -84,74 +135,19 @@ class BipedalEnv(DirectRLEnv):
         self.robot.write_joint_state_to_sim(def_qpos, def_qvel, None, env_ids)
 
         # reset managers
-        self.adm.reset(env_ids)
+        self.rdm.reset(env_ids)
         self.act_mgr.reset(env_ids)
         self.obs_mgr.reset(env_ids)
-    
-    
-    def _pre_physics_step(self, action: th.Tensor):
-        # update action manager
-        self.act_mgr.update_action(action)
-
-        # update command manager
-        # command resample TODO: temporary implementation
-        # import random
-        # resample_indices = [random.randint(0, self.n_env - 1) for _ in range(6)]
-        # self.command[resample_indices,:] = th.rand(6, 3, dtype=th.float32, device=self.device) * 2 - 1
-
-        # clear step info dictionary
-        self.step_info = {}
-    
-    
-    def _apply_action(self):
-        # update delayed action
-        self.act_mgr.update()
-
-        # compute setpoint
-        setpoint = self.adm.qpos_default + self.act_mgr.act_delayed * self.act_scale
-
-        # set setpoint of pd-controller for joints
-        self.robot.set_joint_position_target(setpoint)
-
-
-    def _post_apply_action(self):
-        self.adm.update()
 
 
     def _get_observations(self) -> VecEnvObs:
         # update observation manager
         self.obs_mgr.update(self.act_mgr.act, self.command)
 
-        # TODO: temporary implementation
-        # self.obs_mgr.obs_t
-        # self.obs_mgr.obs_hist
-        # self.obs_mgr.obs_hist_n
-        # self.obs_mgr.obs_priv
-
         # update extras (identical to step)
         self.extras = self.step_info
 
-        return {'policy': self.obs_mgr.obs_hist.view(self.n_env, self.n_obs)}
-
-
-    def _get_rewards(self) -> th.Tensor:
-        # update reward manager
-        self.rwd_mgr.update(self.command)
-        # update reward info
-        self.step_info['reward'] = self.rwd_mgr.info
-        
-        return self.rwd_mgr.reward
-    
-
-    def _get_dones(self) -> Tuple[th.Tensor, th.Tensor]:
-        # update termination manager
-        self.ter_mgr.update()
-        # update done info
-        self.step_info['done'] = self.ter_mgr.info
-        return (
-            self.ter_mgr.terminated,
-            self.ter_mgr.truncated,
-        )
+        return {'policy': self.obs_mgr.obs_hist.view(self.n_env, self.n_obs).clone().detach()}
     
 
     def _set_debug_vis_impl(self, debug_vis: bool):

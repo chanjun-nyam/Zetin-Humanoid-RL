@@ -10,24 +10,27 @@ import torch as th
 
 class HistoryBuffer:
     """History tensor buffer.
-    
-    Shape of buffer gonna be (n_env, n_history, n_dim).
-    """
-
-    buffer: th.Tensor
-    """buffer tensor with shape of (n_env, n_history, n_dim)
     """
 
 
-    def __init__(self, n_env: int, n_history: int, n_dim: int, device: th.device, dtype: th.dtype = th.float32):
-        """Initialize the buffer filled with zeros.
+    def __init__(
+            self,
+            n_env: int,
+            n_history: int,
+            n_dim: int,
+            device: th.device,
+            dtype: th.dtype,
+            value: th.Tensor = 0,
+        ):
+        """Initialize the buffer.
 
         Args:
-            n_env (int): number of environment
-            n_history (int): length of history
-            n_dim (int): dimension of vector
-            device (th.device): device of tensor
-            dtype (th.dtype): data type of tensor
+            n_env (int): Number of vectorized environment dimension.
+            n_history (int): Length of history.
+            n_dim (int): Number of vector dimension.
+            device (th.device): Tensor device.
+            dtype (th.dtype): Tensor data type.
+            value (th.Tensor, optional): Initial value for buffer. It must broadcastable to `buffer`. Defaults to 0.
         """
         self.n_env = n_env
         self.n_history = n_history
@@ -35,89 +38,99 @@ class HistoryBuffer:
         self.device = device
         self.dtype = dtype
 
-        self.buffer = th.zeros(
+        self._buffer = th.zeros(
             size=(n_env, n_history, n_dim),
             device=device,
             dtype=dtype,
         )
 
+        # reset buffer
+        self.ALL_INDICES = th.arange(self.n_env, dtype=th.int64, device=device)
+        self.reset(self.ALL_INDICES, value)
+
 
     @classmethod
-    def init_like(cls, data: th.Tensor, n_history: int) -> HistoryBuffer:
+    def init_like(
+        cls,
+        data: th.Tensor,
+        n_history: int,
+        device: th.device = None,
+        dtype: th.dtype = None,
+        value: th.Tensor = 0,
+    ) -> HistoryBuffer:
         """Initialize the buffer with reference tensor.
 
         Args:
-            data (th.Tensor):
-                Reference tensor for initialization.
-                It must have shape of (n_env, n_dim).
-            n_history (int): length of history
+            data (th.Tensor): Reference tensor. Shape is (n_env, n_dim).
+            n_history (int): Length of history.
+            device (th.device, optional): Tensor device. Defaults to None.
+            dtype (th.dtype, optional): Tensor data type. Defaults to None.
+            value (th.Tensor, optional): Initial value for `buffer`. It must broadcastable to `buffer`. Defaults to 0.
         
         Returns:
-            HistoryBuffer: initialized history buffer
+            HistoryBuffer: Instance of initialized `HistoryBuffer`.
         """
         return HistoryBuffer(
             n_env=data.shape[0],
             n_history=n_history,
             n_dim=data.shape[1],
-            device=data.device,
-            dtype=data.dtype,
+            device=data.device if device is None else device,
+            dtype=data.dtype if dtype is None else dtype,
+            value=value,
         )
-    
+
 
     def update(self, data: th.Tensor):
-        """Push data to buffer.
+        """Update the buffer with new data.
 
         Args:
-            data (th.Tensor):
-                Tensor to push in.
-                It must have shape of (n_env, n_dim).
+            data (th.Tensor): New data. Shape is (n_env, n_dim).
         """
-        self.buffer = self.buffer.roll(shifts=1, dims=1)
-        self.buffer[:,0,:] = data
+        self._buffer.copy_(self._buffer.roll(shifts=1, dims=1))
+        self._buffer[:,0,:] = data
     
 
     def reset(self, env_ids: Sequence[int], value: th.Tensor = 0):
-        """Reset buffer indices of env_ids with given value.
+        """Reset the buffer.
 
         Args:
-            env_ids (Sequence[int]): Sequence of environment indices to reset.
-            value (th.Tensor):
-                Value for reset indices.
-                It must have shape of (len(env_ids), n_dim) or just scalar.
-                Defaults to 0.
+            env_ids (Sequence[int]): Environment indices to reset.
+            value (th.Tensor, optional): Reset value for buffer. It must broadcastable to (len(env_ids), n_history, n_dim). Defaults to 0.
         """
-        if not isinstance(value, th.Tensor):
-            value = th.tensor(value, device=self.device, dtype=self.dtype)
-        value = value.expand(len(env_ids), self.n_dim)
-        
-        self.buffer[env_ids,:,:] = value.unsqueeze(1)
+        self._buffer[env_ids,:,:] = value
+    
+
+    @property
+    def buffer(self):
+        """Main buffer. Shape is (n_env, n_history, n_dim)
+        """
+        return self._buffer
 
 
 
 class SMABuffer:
     """Simple moving average tensor buffer.
-
-    To prevent floating point error accumulation, it recalculate sum for every n_window updates.
-    """
-
-    buffer: th.Tensor
-    """Ring buffer tensor with shape of (n_env, n_window, n_dim).
-    """
-
-    sma: th.Tensor
-    """SMA value tensor with shape of (n_env, n_dim).
     """
 
 
-    def __init__(self, n_env: int, n_window: int, n_dim: int, device: th.device, dtype: th.dtype = th.float32):
-        """Initialize the buffer filled with zeros.
+    def __init__(
+            self,
+            n_env: int,
+            n_window: int,
+            n_dim: int,
+            device: th.device,
+            dtype: th.dtype,
+            value: th.Tensor = 0,
+        ):
+        """Initialize the buffer.
 
         Args:
-            n_env (int): number of environment
-            n_window (int): length of window
-            n_dim (int): dimension of vector
-            device (th.device): device of tensor
-            dtype (th.dtype): data type of tensor
+            n_env (int): Number of vectorized environment dimension.
+            n_window (int): Size of window.
+            n_dim (int): Number of vector dimension.
+            device (th.device): Tensor device.
+            dtype (th.dtype): Tensor data type.
+            value (th.Tensor, optional): Initial value for `sma`. It must broadcastable to `buffer`. Defaults to 0.
         """
         self.n_env = n_env
         self.n_window = n_window
@@ -125,83 +138,97 @@ class SMABuffer:
         self.device = device
         self.dtype = dtype
 
-        self.buffer = th.zeros(
+        self._buffer = th.zeros(
             size=(n_env, n_window, n_dim),
             device=device,
             dtype=dtype,
         )
-        self.sma = th.zeros(
+        self._buffer_len = th.zeros(
+            size=(n_env,),
+            device=device,
+            dtype=th.int64,
+        )
+        self._sma = th.zeros(
             size=(n_env, n_dim),
             device=device,
             dtype=dtype,
         )
         self.ptr = 0
-        # indicate index where new data must be push in (where old data must be pop out)
+        # index where new data must be push in (where old data must be pop out)
 
-        self.sma2 = th.zeros_like(self.sma)
+        self.ALL_INDICES = th.arange(self.n_env, dtype=th.int64, device=device)
+        self.reset(self.ALL_INDICES, value)
 
     
     @classmethod
-    def init_like(cls, data: th.Tensor, n_window: int) -> SMABuffer:
+    def init_like(
+        cls,
+        data: th.Tensor,
+        n_window: int,
+        device: th.device = None,
+        dtype: th.dtype = None,
+        value: th.Tensor = 0,
+    ) -> SMABuffer:
         """Initialize the buffer with reference tensor.
 
         Args:
-            data (th.Tensor):
-                Reference tensor for initialization.
-                It must have shape of (n_env, n_dim).
-            n_window (int): length of window
+            data (th.Tensor): Reference tensor. Shape is (n_env, n_dim).
+            n_window (int): Size of window.
+            device (th.device, optional): Tensor device. Defaults to None.
+            dtype (th.dtype, optional): Tensor data type. Defaults to None.
+            value (th.Tensor, optional): Initial value for `sma`. It must broadcastable to `buffer`. Defaults to 0.
         
         Returns:
-            SMABuffer: initialized sma buffer
+            SMABuffer: Instance of initialized `SMABuffer`.
         """
         return SMABuffer(
             n_env=data.shape[0],
             n_window=n_window,
             n_dim=data.shape[1],
-            device=data.device,
-            dtype=data.dtype,
+            device=data.device if device is None else device,
+            dtype=data.dtype if dtype is None else dtype,
+            value=value,
         )
     
 
+    def _update_sma(self):
+        self._sma.copy_(self._buffer.sum(dim=1) / self._buffer_len.unsqueeze(-1).clip(min=1))
+    
+
     def update(self, data: th.Tensor):
-        """Update sma and buffer
+        """Update the buffer with new data.
 
         Args:
-            data (th.Tensor):
-                Tensor to update the sma.
-                It must have shape of (n_env, n_dim).
+            data (th.Tensor): New data. Shape is (n_env, n_dim).
         """
-        self.sma += (data - self.buffer[:,self.ptr,:]) / self.n_window
-        self.buffer[:,self.ptr,:] = data
+        # update buffer
+        self._buffer[:,self.ptr,:] = data
+        self._buffer_len.add_(1).clip_(max=self.n_window)
         self.ptr = (self.ptr + 1) % self.n_window
 
-        self.sma2 += data / self.n_window
-        if self.ptr == 0:
-            self.sma[:,:] = self.sma2[:,:]
-            self.sma2[:,:] = 0
-
-
-        # TODO
-        self.sma[:,:] = data
+        self._update_sma()
 
 
     def reset(self, env_ids: Sequence[int], value: th.Tensor = 0):
-        """Reset buffer indices of env_ids with given value.
+        """Reset the buffer.
 
         Args:
-            env_ids (Sequence[int]): Sequence of environment indices to reset.
-            value (th.Tensor):
-                Value for reseted indices.
-                It must have shape of (len(env_ids), n_dim) or just scalar.
-                Defaults to 0.
+            env_ids (Sequence[int]): Environment indices to reset.
+            value (th.Tensor, optional): Reset value for buffer. It must broadcastable to (len(env_ids), n_dim). Defaults to 0.
         """
-        if not isinstance(value, th.Tensor):
-            value = th.tensor(value, device=self.device, dtype=self.dtype)
-        value = value.expand(len(env_ids), self.n_dim)
+        # reset buffer
+        self._buffer[env_ids,:,:] = 0.0
+        self._buffer[env_ids,self.ptr,:] = value
+        self._buffer_len[env_ids] = 0
 
-        self.buffer[env_ids,:,:] = value.unsqueeze(1)
-        self.sma[env_ids,:] = value
-        self.sma2[env_ids,:] = value * (self.ptr / self.n_window)
+        self._update_sma()
+    
+
+    @property
+    def sma(self):
+        """SMA value. Shape is (n_env, n_dim).
+        """
+        return self._sma
 
 
 

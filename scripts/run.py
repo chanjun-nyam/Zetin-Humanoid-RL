@@ -10,8 +10,10 @@ RUN_MODE = 'train'
 ENV_NAME = 'Tron1Env'
 RUN_PATH = 'results/runs'
 MODEL_PATH = 'results/models/model.pt'
-STOCHASTIC = True
+# MODEL_PATH = '/home/chanjun/workspace/Projects/Zetin-Humanoid-RL/results/runs/2026-05-20_05.42.50/checkpoints/model_600.pt'
+# STOCHASTIC = True
 # STOCHASTIC = False
+STOCHASTIC = RUN_MODE == 'train'
 
 from simple_rl.runner import PPORunner
 from simple_rl.algorithms.ppo import PPO, PPOCfg
@@ -52,6 +54,7 @@ def main():
     ppo = PPO(env.spec, actor_critic, ppo_cfg)
 
     print(env.spec)
+    print(env.env.robot.data.joint_names)
 
     # train
     if RUN_MODE == 'train':
@@ -69,13 +72,21 @@ def main():
     elif RUN_MODE == 'test' or RUN_MODE == 'play':
         if RUN_MODE == 'play':
             ppo.load(MODEL_PATH)
+
+        import time
         
         obs, info = env.reset()
         
         while simulation_app.is_running():
+            start_s = time.time()
             obs, rwd, ter, tru, info = env.step(
                 ppo.act(obs, deterministic=(not STOCHASTIC))
             )
+            end_s = time.time()
+
+            # print(('%6.3f\t'*8) % (*env.env.rdm.qpos[0,:].tolist(),))
+
+            # print(1 / (end_s - start_s))
         #     break
 
         

@@ -3,8 +3,8 @@ from isaaclab.app import AppLauncher
 app_launcher = AppLauncher(livestream=2)
 simulation_app = app_launcher.app
 
-RUN_MODE = 'train'
-# RUN_MODE = 'play'
+# RUN_MODE = 'train'
+RUN_MODE = 'play'
 # RUN_MODE = 'test'
 
 RUN_PATH = 'results/runs_old'
@@ -18,8 +18,9 @@ from simple_rl.modules.modules import MlpActorCritic
 
 from bipedal_lab.env_utils import IsaacEnvWrapper
 from tron_loco.velocity.tron_env import TronEnvCfg
-from isaaclab.envs import ManagerBasedRLEnv
 import torch as th
+# from mg import ManagerBasedRLEnv
+from isaaclab.envs import ManagerBasedRLEnv
 
 
 def main():

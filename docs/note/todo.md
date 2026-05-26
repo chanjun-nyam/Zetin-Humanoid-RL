@@ -10,17 +10,26 @@
 
 **RL Environment**
 
+simple rl -> keyboard exception 에서 checkpoint saving
+
 known problem
 학습 도중 sampling std sample 할때 std 가 negative or nan 임
 - env 문제 x, observation/action manager 의 tensor debugger 에서 검출 안됨
 - 그러면 ppo, 또는 일종의 steep gradient(?) 문제 같은데 (td3 에서 뭐 비슷한 내용 있었던것 같은데) -> obs noise 추가 하기
 
+jointi pos, torque penalty (joint 별로 다르게)
 
 module 마다 non check, log 관리
 
 nan 발생 시 env capture + model capture + nan 발생 action acpture
 
 torch.jit 고려
+
+obs, rwd manager base -> tilt frame
+
+tensor debugger env wrapper
+
+simple rl text log option, path print
 
 observation manager > n_obs != env.n_obs <<<<<<<<<<<<<<<<< 검토
 

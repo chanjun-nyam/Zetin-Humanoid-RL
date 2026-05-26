@@ -131,7 +131,6 @@ class ObservationsCfg:
             noise=Unoise(n_min=-0.05, n_max=0.05),
             history_length=10//10,
         )
-        velocity_commands = ObservationTermCfg(func=mdp.generated_commands, params={'command_name': 'base_velocity'})
         joint_pos = ObservationTermCfg(func=mdp.joint_pos_rel, noise=Unoise(n_min=-0.01, n_max=0.01), history_length=10//10)
         joint_vel = ObservationTermCfg(func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5), history_length=10//10)
         actions = ObservationTermCfg(func=mdp.last_action, history_length=10//10)
@@ -141,6 +140,7 @@ class ObservationsCfg:
         #     noise=Unoise(n_min=-0.1, n_max=0.1),
         #     clip=(-1.0, 1.0),
         # )
+        velocity_commands = ObservationTermCfg(func=mdp.generated_commands, params={'command_name': 'base_velocity'})
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -178,7 +178,7 @@ class RewardsCfg:
             'command_name': 'base_velocity',
             'std': 0.5,
         },
-        weight=1.0
+        weight=1.0,
     )
     track_ang = RewardTermCfg(
         func=mdp.track_ang_vel_z_exp,
@@ -284,16 +284,16 @@ class EventsCfg:
     #     }
     # )
 
-    # # reset
-    # reset_accel = EventTermCfg(
-    #     func=mdp.apply_external_force_torque,
-    #     mode='reset',
-    #     params={
-    #         'asset_cfg': SceneEntityCfg('robot', body_names='base_Link'),
-    #         'force_range': (0.0, 0.0),
-    #         'torque_range': (-0.0, 0.0),
-    #     },
-    # )
+    # reset
+    reset_accel = EventTermCfg(
+        func=mdp.apply_external_force_torque,
+        mode='reset',
+        params={
+            'asset_cfg': SceneEntityCfg('robot', body_names='base_Link'),
+            'force_range': (0.0, 0.0),
+            'torque_range': (-0.0, 0.0),
+        },
+    )
 
     reset_root_state = EventTermCfg(
         func=mdp.reset_root_state_uniform,
@@ -382,8 +382,8 @@ class BipedalBaseEnvCfg(ManagerBasedRLEnvCfg):
         self.episode_length_s = 20.0
 
         self.scene.num_envs = 4096
-        # self.scene.num_envs = 2 ** 7
-        self.scene.env_spacing = 2.5
+        self.scene.num_envs = 2 ** 6
+        self.scene.env_spacing = 4.0
 
         self.sim.device = 'cuda:0'
         self.sim.dt = 0.005 # 200Hz

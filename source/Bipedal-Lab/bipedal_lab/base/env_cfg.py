@@ -9,9 +9,9 @@ from typing import List
 
 from bipedal_lab.base.managers import (
     ActionManagerCfg,
-    ArticulationDataManagerCfg,
     ObservationManagerCfg,
     RewardManagerCfg,
+    RobotDataManagerCfg,
     TerminationManagerCfg,
 )
 
@@ -43,7 +43,7 @@ class BipedalEnvCfg(DirectRLEnvCfg):
 
     robot_cfg: SceneEntityCfg = MISSING
 
-    adm_cfg: ArticulationDataManagerCfg = MISSING
+    rdm_cfg: RobotDataManagerCfg = MISSING
 
     act_cfg: ActionManagerCfg = MISSING
 

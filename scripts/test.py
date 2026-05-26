@@ -11,6 +11,9 @@ from tron_loco.velocity.tron_env import TronEnvCfg
 from isaaclab.envs import ManagerBasedRLEnv
 
 import torch as th
+import bipedal_lab.tasks
+from bipedal_lab.env_utils import env_loader
+
 
 def main():
 
@@ -23,18 +26,42 @@ def main():
 
     obs, info = env.reset()
     print(obs.shape)
+    print('articulation num', len(env.env.scene.articulations))
 
     while simulation_app.is_running():
-        obs, rwd, ter, tru, info = env.step(
-            th.randn((env.n_env, env.n_action), device=env.device)
-        )
+
+        dummy_action = th.zeros((env.n_env, env.n_action), dtype=th.float32, device=env.device)
+
+        # action = th.zeros_like(dummy_action)
+        # action = th.ones_like(dummy_action) * 0.3
+        action = th.randn_like(dummy_action)
+
+        obs, rwd, ter, tru, info = env.step(action)
+
+        state = list(env.env.scene.articulations.values())[0].data.root_state_w
         
-        print(obs.shape)
-        # print(obs)
-        # print(rwd.shape)
-        # print(ter.shape)
-        # print(tru.shape)
-        # print(info)
+        # print(
+        #     rwd.mean().item(),
+        #     rwd.std().item(),
+        #     rwd.min().item(),
+        #     rwd.max().item(),
+        #     sep='\t',
+        # )
+
+        # print(rwd.item())
+
+        # print(
+        #     state.mean().item(),
+        #     state.std().item(),
+        #     state.min().item(),
+        #     state.max().item(),
+        #     sep='\t',
+        # )
+
+        # print(
+        #     *[state[:,k*2].item() for k in range(5)],
+        #     sep='\t',
+        # )
 
     env.close()
 
