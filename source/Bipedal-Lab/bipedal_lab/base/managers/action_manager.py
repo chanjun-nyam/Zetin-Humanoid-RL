@@ -1,7 +1,10 @@
 from isaaclab.envs import DirectRLEnv
+from isaaclab.assets import Articulation
+from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 from collections.abc import Sequence
+from typing import List
 from dataclasses import MISSING
 
 import gymnasium.spaces as spaces
@@ -23,6 +26,14 @@ class ActionManagerCfg:
     Note:
         It must be less or equal than `decimation` of the environment.
     """
+
+    ar_robot: SceneEntityCfg = MISSING
+    """`SceneEntityCfg` of `Articulation`
+    """
+
+    q_names: List[str] = MISSING
+
+    q_scale: List[float] = MISSING
 
 
 
@@ -48,17 +59,14 @@ class ActionManager:
             len(env.single_action_space.shape) == 1
         ):
             raise ValueError('Only single vector action space is supported.')
-        
+
         self.n_env = env.num_envs
         self.n_act = env.single_action_space.shape[-1]
 
-        dummy_act = th.zeros(
-            size=(self.n_env, self.n_act),
-            dtype=th.float32,
-            device=env.device,
-        )
+        self.robot: Articulation = env.scene[cfg.ar_robot.name]
 
         # source tensors for defensive copying
+        # action difference tensor
         self.ACT_DIFF_ORD = 2 # we don't need higher order
         self._act_diff = [
             th.zeros(
@@ -68,9 +76,21 @@ class ActionManager:
             ) for i in range(self.ACT_DIFF_ORD + 1)
             # self._act_diff[i][:,j,:]: j-th previous i-th order difference action tensor
         ]
-        
-        self._act_delayed = th.zeros_like(dummy_act)
-        
+
+        # delayed action tensor
+        self._act_delayed = th.zeros(
+            size=(self.n_env, self.n_act),
+            dtype=th.float32,
+            device=env.device,
+        )
+
+        # q-scale (action scale) tensor
+        idx_map = [cfg.q_names.index(name) for name in self.robot.data.joint_names]
+        self._q_scale = th.tensor(
+            [cfg.q_scale[idx_map[i]] for i in range(len(idx_map))],
+            dtype=th.float32, device=env.device,
+        ) # (n_qdim,)
+
         # initialize delay table
         self.delay_table = th.randint_like(
             input=self._act_delayed[:,0],
@@ -162,3 +182,10 @@ class ActionManager:
         - `o` + `t` <= `ACT_DIFF_ORD` = 2
         """
         return self._act_diff[o][:,t,:].clone()
+
+
+    @property
+    def q_scale(self):
+        """q-scale (action scale) tensor. Shape is (n_qdim,).
+        """
+        return self._q_scale.clone()

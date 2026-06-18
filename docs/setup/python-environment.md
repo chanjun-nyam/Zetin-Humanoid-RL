@@ -29,6 +29,9 @@ uv pip install git+https://github.com/chanjun-nyam/Simple-RL.git
 # NVIDIA-GPU monitoring tool
 uv pip install nvitop
 
+# CLI application tool
+uv pip install "typer[all]"
+
 # setup isaacsim packages (this must be run for every new terminal)
 source ./load_isaacsim_package.sh
 ```

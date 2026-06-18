@@ -1,6 +1,4 @@
-from isaaclab.envs import ManagerBasedEnv, DirectRLEnv
-
-from typing import Type, Tuple, Dict
+from typing import Type, Dict
 
 from bipedal_lab.env_utils.env_wrapper import IsaacEnvWrapper
 
@@ -11,24 +9,25 @@ from simple_rl.env import BaseEnv
 """
 
 
-_table: Dict[str, Tuple[Type[ManagerBasedEnv] | Type[DirectRLEnv], Dict]] = {}
+_table = {}
 
 
-def register(id: str, env_cls: Type[object], default_kwargs: Dict):
+def register(id: str, env_cls: Type[object], cfg_cls: Type[object], default_kwargs: Dict):
     """Register new environment.
 
     Args:
         id (str): Id for new environment.
-        env_cls (Type[object]): Class of environment.
-        default_kwargs (Dict): Default kwargs when creating the environment.
+        env_cls (Type[object]): Environment class.
+        cfg_cls (Type[object]): Configuration class.
+        default_kwargs (Dict): Default kwargs for configuration class.
 
     Raises:
         KeyError: When given id is already used.
     """
     if id in _table:
         raise KeyError(f'Environment id {id} is already used.')
-    
-    _table[id] = (env_cls, default_kwargs)
+
+    _table[id] = (env_cls, cfg_cls, default_kwargs)
 
 
 def make(id: str, reward_scale: float = 1.0, **kwargs) -> BaseEnv:
@@ -42,6 +41,7 @@ def make(id: str, reward_scale: float = 1.0, **kwargs) -> BaseEnv:
     Returns:
         BaseEnv: Wrapped isaac environment.
     """
-    env_cls, default_kwargs = _table[id]
-    env = env_cls(**(default_kwargs | kwargs))
+    env_cls, cfg_cls, default_kwargs = _table[id]
+    cfg = cfg_cls(**(default_kwargs | kwargs))
+    env = env_cls(cfg)
     return IsaacEnvWrapper(env, reward_scale)

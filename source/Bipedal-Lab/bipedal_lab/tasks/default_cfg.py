@@ -1,48 +1,45 @@
-from isaaclab.managers import SceneEntityCfg
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
+from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import ContactSensorCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 import isaaclab.sim as sim_utils
 
+from typing import Literal
 from dataclasses import MISSING
 
+import torch as th
+
 from bipedal_lab.base.env_cfg import BipedalEnvCfg
-from bipedal_lab.base.managers import (
-    ActionManagerCfg,
-    ObservationManagerCfg,
-    RewardManagerCfg,
-    RobotDataManagerCfg,
-    TerminationManagerCfg,
-)
+from bipedal_lab.tasks.terrain_cfg import ROUGH_TERRAIN_CFG
 
 
 
-SIM_DT = 1 / 200
-DECIMATION = 4
-EPISODE_LENGTH = 1000
-NUM_ENVS = 2 ** 12
-ENV_SPACING = 4.0
-DEVICE = 'cuda:0'
-# NUM_ENVS, DEVICE = 1, 'cpu'
+_POST_INIT = None
+
 
 
 @configclass
 class SceneCfg(InteractiveSceneCfg):
 
+    num_envs = _POST_INIT
+
+    env_spacing = _POST_INIT
+
     terrain = TerrainImporterCfg(
         prim_path='/World/ground',
-        terrain_type='plane',
-        terrain_generator=None,
-        max_init_terrain_level=5,
+        terrain_type=_POST_INIT,
+        terrain_generator=_POST_INIT,
+        max_init_terrain_level=0,
         collision_group=-1,
         physics_material=sim_utils.RigidBodyMaterialCfg(
             friction_combine_mode='multiply',
             restitution_combine_mode='multiply',
             static_friction=1.0,
             dynamic_friction=1.0,
+            restitution=0.0,
         ),
         visual_material=sim_utils.MdlFileCfg(
             mdl_path=f'{ISAACLAB_NUCLEUS_DIR}/Materials/TilesMarbleSpiderWhiteBrickBondHoned/TilesMarbleSpiderWhiteBrickBondHoned.mdl',
@@ -56,11 +53,11 @@ class SceneCfg(InteractiveSceneCfg):
 
     contact_sensor = ContactSensorCfg(
         prim_path='{ENV_REGEX_NS}/Robot/.*',
-        update_period=SIM_DT,
-        history_length=DECIMATION,
+        update_period=_POST_INIT,
+        history_length=_POST_INIT,
         track_air_time=True,
     )
-    
+
     sky_light = AssetBaseCfg(
         prim_path='/World/SkyLight',
         spawn=sim_utils.DomeLightCfg(
@@ -71,150 +68,92 @@ class SceneCfg(InteractiveSceneCfg):
 
 
 
+def _get_check(t: Literal['slow', 'fast']):
+    def check(rng: th.Tensor):
+        # input shape: (n_cell, n_cmd, 2)
+        # output shape: (n_cell,)
+        cent = rng.mean(dim=-1) # (n_cell, n_cmd)
+        if t == 'slow':
+            return cent[:,0].abs() < 1.0
+        elif t == 'fast':
+            return th.ones_like(cent[:,0], dtype=th.bool)
+    return check
+
+
+
 @configclass
 class DefaultEnvCfg(BipedalEnvCfg):
 
-    # config terms derived from `DirectRLEnv`
+    sim_dt: float = 1 / 200
+
+    decimation: int = 4
+
+    episode_length: int = 1000
+
+    n_env: int = MISSING
+
+    device: str = MISSING
+
+    terrain_type: Literal['flat', 'rough'] = MISSING
+
+    # ----------
 
     sim = sim_utils.SimulationCfg(
-        device=DEVICE,
-        dt=SIM_DT,
-        render_interval=DECIMATION,
+        device=_POST_INIT,
+        dt=_POST_INIT,
+        render_interval=_POST_INIT,
+        physics_material=_POST_INIT,
     )
 
-    decimation = DECIMATION
+    episode_length_s = _POST_INIT
 
-    episode_length_s = EPISODE_LENGTH * DECIMATION * SIM_DT
-
-    scene = SceneCfg(NUM_ENVS, ENV_SPACING)
+    scene = SceneCfg()
 
     action_space = MISSING
 
     observation_space = MISSING
 
-    # config terms derived from `BipedalEnv`
+    # ----------
 
-    action_scale = 0.5
+    ar_robot = SceneEntityCfg(name='robot')
 
-    robot_cfg = SceneEntityCfg(name='robot')
+    sub_terrains = {
+        'stair_inv':BipedalEnvCfg.SubTerrainCfg(prop=0.2, check=_get_check('slow')),
+        'stair':    BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
+        'wave':     BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
+        'grid':     BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
+        'uniform':  BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
+        'slope_inv':BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
+        'slope':    BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
+    }
 
-    rdm_cfg = RobotDataManagerCfg(
-        ar_robot=SceneEntityCfg(name='robot'),
-        co_robot=SceneEntityCfg(name='contact_sensor'),
-    )
+    vel_err_sma_window = 20 # 0.4s
 
-    act_cfg = ActionManagerCfg(
-        # min_delayed_steps=1,
-        # max_delayed_steps=DECIMATION,
-        min_delayed_steps=1,
-        max_delayed_steps=3,
-    )
+    foll_boundary = 0.4
 
-    obs_cfg = ObservationManagerCfg(
-        n_history=MISSING,
-        # obs_scale=[
-        #     0.25,   # root_angvel_b
-        #     1.0,    # gravity_dir_b
-        #     1.0,    # qpos
-        #     0.05,   # qvel
-        #     1.0,    # action
-        #     1.0,    # command
-        #     1.0,    # root_linvel_t
-        # ],
-        obs_scale=[1.0 for _ in range(7)],
-    )
+    foll_hyst = (0.5, 0.7) # Note. 10m / (1m/s * 12s) = 0.833
 
-    rwd_cfg = RewardManagerCfg(
-        ar_robot=SceneEntityCfg(
-            name='robot',
-        ),
-        ar_foot=SceneEntityCfg(
-            name='robot',
-            body_names=['ankle_(L|R)_Link'],
-            preserve_order=True,
-        ),
-        co_body=SceneEntityCfg(
-            name='contact_sensor',
-            body_names=['base_Link', 'abad_(L|R)_Link', 'hip_(L|R)_Link', 'knee_(L|R)_Link'],
-        ),
-        co_foot=SceneEntityCfg(
-            name='contact_sensor',
-            body_names=['ankle_(L|R)_Link'],
-            preserve_order=True,
-        ),
+    # ----------
 
-        track_lin_err_scale = 2.0,
-        track_ang_err_scale = 2.0,
 
-        q_names=[
-            'abad_L_Joint', 'abad_R_Joint', # sign inverted (mirrored value)
-            'hip_L_Joint',  'hip_R_Joint',  # sign inverted
-            'knee_L_Joint', 'knee_R_Joint', # sign inverted
-            'ankle_L_Joint','ankle_R_Joint',# sign correct
-        ],
-        qpos_limit=[
-            [-0.2, 0.6], # abad_L_Joint
-            [-0.6, 0.2], # abad_R_Joint
-            [-0.5, 0.5], # hip_L_Joint
-            [-0.5, 0.5], # hip_R_Joint
-            [-0.2, 0.9], # knee_L_Joint
-            [-0.9, 0.2], # knee_R_Joint
-            [-0.5, 0.5], # ankle_L_Joint
-            [-0.5, 0.5], # ankle_R_Joint
-        ],
-        qtau_limit=[
-            [-30.0, 30.0], # abad_L_Joint
-            [-30.0, 30.0], # abad_R_Joint
-            [-30.0, 30.0], # hip_L_Joint
-            [-30.0, 30.0], # hip_R_Joint
-            [-30.0, 30.0], # knee_L_Joint
-            [-30.0, 30.0], # knee_R_Joint
-            [-30.0, 30.0], # ankle_L_Joint
-            [-30.0, 30.0], # ankle_R_Joint
-        ],
+    def __post_init__(self):
+        super().__post_init__()
+        
+        self.sim.device = self.device
+        self.sim.dt = self.sim_dt
+        self.sim.render_interval = self.decimation
+        self.sim.physics_material = self.scene.terrain.physics_material
+        self.sim.physx.gpu_max_rigid_patch_count = 5 * 2**16
+        self.sim.physx.gpu_collision_stack_size = 2**27
 
-        foot_stance_z       = -0.75,
-        foot_clear_z        = 0.25,
-        foot_min_air_ratio  = 0.4,
-        foot_min_period     = 0.5,
+        self.episode_length_s = self.episode_length * self.decimation * self.sim_dt
 
-        min_mean_reward     = 0.0,
+        self.scene: SceneCfg
+        self.scene.num_envs = self.n_env
+        self.scene.env_spacing = 4.0
+        self.scene.contact_sensor.update_period = self.sim_dt
+        self.scene.contact_sensor.history_length = self.decimation
 
-        k_track_lin     = 1.0,
-        k_track_ang     = 0.5,
-        k_pen_lin       = -2.0,
-        k_pen_ang       = -0.05,
-        k_upright       = -0.2,
-        # k_mec_energy    = -1e-5,
-        # k_the_energy    = -1e-5,
-        k_mec_energy    = -1e-4, # TODO
-        k_the_energy    = -2e-5, # TODO
-        k_d_action      = -0.005,
-        k_d2_action     = -0.005,
-        k_qpos_limit    = -0.05,
-        k_qtau_limit    = -0.001,
-        k_contact       = -0.5,
-        # k_foot_clear    = -2.0,
-        # k_foot_clear    = -0.5, # 0.5 * 0.2 * 2 = 0.2
-        # k_foot_clear    = -0.3, # 0.3 * 0.2 * 2 = 0.12 #TODO
-        k_foot_clear    = -0.5, # 0.3 * 0.2 * 2 = 0.12 #TODO
-        # k_foot_ratio    = -0.2,
-        # k_foot_period   = -0.2,
-        k_foot_ratio    = 1.0 * 0.25 * 0.5, # 0.4 * 0.25 * 0.5 * 2 = 0.1
-        # k_foot_period   = 0.4 * 0.25 * 2.0, # 0.4 * 0.25 * 2.0 * 2 = 0.4
-        # k_foot_period   = 0.4 * 0.25 * 1.0, # 0.4 * 0.25 * 1.0 * 2 = 0.2 #TODO
-        k_foot_period   = 0.4 * 0.25 * 5.0, # 0.4 * 0.25 * 5.0 * 2 = 1.0 #TODO
-        k_termin        = -10.0,
-    )
-
-    ter_cfg = TerminationManagerCfg(
-        ar_robot=SceneEntityCfg(name='robot'),
-        co_termin=SceneEntityCfg(
-            name='contact_sensor',
-            body_names=['base_Link', 'abad_(L|R)_Link'],
-        ),
-        max_tilt_angle=180.0,
-        max_episode_length=EPISODE_LENGTH,
-        max_normal_force=1.0,
-        normal_force_history_length=DECIMATION,
-    )
+        is_rough = self.terrain_type == 'rough'
+        self.scene.terrain.terrain_type = 'generator' if is_rough else 'plane'
+        self.scene.terrain.terrain_generator = ROUGH_TERRAIN_CFG if is_rough else None

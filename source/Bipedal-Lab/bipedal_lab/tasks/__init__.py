@@ -1,1 +1,4 @@
-from bipedal_lab.tasks import tron1
+from bipedal_lab.tasks import (
+    tron1,
+    zetbot,
+)

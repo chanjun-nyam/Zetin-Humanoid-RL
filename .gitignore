@@ -12,6 +12,10 @@ wheels/
 # runs
 /results/
 /results/runs/
+/runs/
+/models/
 
 # mkdocs
 /site/
+
+/memos/

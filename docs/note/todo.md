@@ -10,14 +10,23 @@
 
 **RL Environment**
 
+marker
+
+adaptive foot_period/gap_height, foot
+
+zero command reward
+
+observation delay
+
+foot push
+
+push curriculum env
+
 simple rl -> keyboard exception 에서 checkpoint saving
 
-known problem
-학습 도중 sampling std sample 할때 std 가 negative or nan 임
-- env 문제 x, observation/action manager 의 tensor debugger 에서 검출 안됨
-- 그러면 ppo, 또는 일종의 steep gradient(?) 문제 같은데 (td3 에서 뭐 비슷한 내용 있었던것 같은데) -> obs noise 추가 하기
+polar space GTC
 
-jointi pos, torque penalty (joint 별로 다르게)
+UCB inspired curriculum
 
 module 마다 non check, log 관리
 
@@ -30,8 +39,6 @@ obs, rwd manager base -> tilt frame
 tensor debugger env wrapper
 
 simple rl text log option, path print
-
-observation manager > n_obs != env.n_obs <<<<<<<<<<<<<<<<< 검토
 
 obs/reward clip
 
@@ -48,8 +55,6 @@ TensorDebugger 문서화
 
 - command
   - period
-
-- randomize
 
 - termination
 ```
@@ -74,11 +79,6 @@ offset: 1, 0, 1, 2, 1
   - ppo warmup stages (encoder, forward model 등의 초기 학습을 위해)
 
 **scripts**
-
-run scripts
-- functionalities
-  - train, play, test, benchmark (terrain mesh 조각내기)
-- Typer 이용해 구현
 
 vscode workspace setup script
 

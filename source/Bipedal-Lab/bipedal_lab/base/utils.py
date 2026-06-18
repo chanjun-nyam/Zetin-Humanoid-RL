@@ -3,6 +3,9 @@ from __future__ import annotations
 from isaaclab.envs import DirectRLEnv, VecEnvStepReturn
 
 from collections.abc import Sequence
+from itertools import accumulate
+from typing import List, Tuple
+import math
 
 import torch as th
 
@@ -109,15 +112,15 @@ class HistoryBuffer:
 
 
 class SMABuffer:
-    """Simple moving average tensor buffer.
+    """Simple moving average buffer implemented on pytorch tensor.
     """
 
 
     def __init__(
             self,
-            n_env: int,
+            shape: Tuple[int],
+            zip_dims: Tuple[int],
             n_window: int,
-            n_dim: int,
             device: th.device,
             dtype: th.dtype,
             value: th.Tensor = 0,
@@ -125,45 +128,46 @@ class SMABuffer:
         """Initialize the buffer.
 
         Args:
-            n_env (int): Number of vectorized environment dimension.
+            shape (Tuple[int]): Shape of data tensor.
             n_window (int): Size of window.
-            n_dim (int): Number of vector dimension.
-            device (th.device): Tensor device.
-            dtype (th.dtype): Tensor data type.
+            device (th.device): Device of data tensor.
+            dtype (th.dtype): Data type of data tensor.
             value (th.Tensor, optional): Initial value for `sma`. It must broadcastable to `buffer`. Defaults to 0.
         """
-        self.n_env = n_env
+        self.shape = shape
+        self.zip_dims = zip_dims
+        self.zip_shape = tuple([s if d not in zip_dims else 1 for d, s in enumerate(shape)])
         self.n_window = n_window
-        self.n_dim = n_dim
         self.device = device
         self.dtype = dtype
 
-        self._buffer = th.zeros(
-            size=(n_env, n_window, n_dim),
+        self._buff = th.zeros(
+            size=(n_window, *shape),
             device=device,
             dtype=dtype,
         )
-        self._buffer_len = th.zeros(
-            size=(n_env,),
+        self._buff_len = th.zeros(
+            size=self.zip_shape,
             device=device,
             dtype=th.int64,
         )
         self._sma = th.zeros(
-            size=(n_env, n_dim),
+            size=shape,
             device=device,
             dtype=dtype,
         )
         self.ptr = 0
         # index where new data must be push in (where old data must be pop out)
 
-        self.ALL_INDICES = th.arange(self.n_env, dtype=th.int64, device=device)
+        self.ALL_INDICES = th.ones(size=self.zip_shape, dtype=th.bool, device=device)
         self.reset(self.ALL_INDICES, value)
 
-    
+
     @classmethod
     def init_like(
         cls,
         data: th.Tensor,
+        zip_dims: Tuple[int],
         n_window: int,
         device: th.device = None,
         dtype: th.dtype = None,
@@ -177,56 +181,70 @@ class SMABuffer:
             device (th.device, optional): Tensor device. Defaults to None.
             dtype (th.dtype, optional): Tensor data type. Defaults to None.
             value (th.Tensor, optional): Initial value for `sma`. It must broadcastable to `buffer`. Defaults to 0.
-        
+
         Returns:
             SMABuffer: Instance of initialized `SMABuffer`.
         """
         return SMABuffer(
-            n_env=data.shape[0],
+            shape=tuple(data.shape),
+            zip_dims=zip_dims,
             n_window=n_window,
-            n_dim=data.shape[1],
             device=data.device if device is None else device,
             dtype=data.dtype if dtype is None else dtype,
             value=value,
         )
-    
+
 
     def _update_sma(self):
-        self._sma.copy_(self._buffer.sum(dim=1) / self._buffer_len.unsqueeze(-1).clip(min=1))
-    
+        self._sma.copy_(self._buff.sum(dim=0) / self._buff_len.clip(min=1))
+
 
     def update(self, data: th.Tensor):
         """Update the buffer with new data.
 
         Args:
-            data (th.Tensor): New data. Shape is (n_env, n_dim).
+            data (th.Tensor): Data tensor.
         """
-        # update buffer
-        self._buffer[:,self.ptr,:] = data
-        self._buffer_len.add_(1).clip_(max=self.n_window)
+        self._buff[self.ptr,...] = data
+        self._buff_len.add_(1).clip_(max=self.n_window)
         self.ptr = (self.ptr + 1) % self.n_window
 
         self._update_sma()
 
 
-    def reset(self, env_ids: Sequence[int], value: th.Tensor = 0):
+    def reset(self, indices: th.Tensor | Tuple[Sequence[int]] | Sequence[int], value: th.Tensor = 0):
         """Reset the buffer.
 
         Args:
-            env_ids (Sequence[int]): Environment indices to reset.
-            value (th.Tensor, optional): Reset value for buffer. It must broadcastable to (len(env_ids), n_dim). Defaults to 0.
+            indices (th.Tensor | Tuple[Sequence[int]] | Sequence[int]): Indices to reset. It can be either boolen mask tensor or tuple of indices or just indices when length of tuple is 1.
+            value (th.Tensor, optional): Reset value for buffer.
         """
-        # reset buffer
-        self._buffer[env_ids,:,:] = 0.0
-        self._buffer[env_ids,self.ptr,:] = value
-        self._buffer_len[env_ids] = 0
+        if isinstance(indices, th.Tensor) and indices.dtype != th.bool:
+            indices = (indices,)
+
+        if isinstance(indices, th.Tensor):
+            indices = indices.view(*self.zip_shape)
+
+            self._buff_len.masked_fill_(indices, 0)
+            self._buff.masked_fill_(indices, 0.0)
+
+            ptr_slot = self._buff[self.ptr, ...]
+            ptr_slot.copy_(th.where(indices, value, ptr_slot))
+        elif isinstance(indices, tuple):
+            indices = tuple([i if d not in self.zip_dims else slice(None) for d, i in enumerate(indices)])
+
+            self._buff_len[indices] = 0
+            self._buff[:,*indices] = 0.0
+            self._buff[self.ptr,...][indices] = value
+        else:
+            raise ValueError(f'Not supported type for `indices`: {type(indices)}')
 
         self._update_sma()
-    
+
 
     @property
     def sma(self):
-        """SMA value. Shape is (n_env, n_dim).
+        """SMA value.
         """
         return self._sma
 
@@ -301,3 +319,48 @@ def direct_rl_env_extended_step(self: DirectRLEnv, action: th.Tensor) -> VecEnvS
 
     # return observations, rewards, resets and extras
     return self.obs_buf, self.reward_buf, self.reset_terminated, self.reset_time_outs, self.extras
+
+
+
+def distribute_number(n: int, p_list: List[float], eps: float = 1e-8) -> List[int]:
+    """Distribute int number `n` proportional to float numbers in `p_list`.
+
+    Args:
+        n (int): Int number.
+        p_list (List[float]): Float numbers.
+        eps (float, optional): Epsilon. Defaults to 1e-8.
+
+    Returns:
+        List[int]: Distributed int numbers.
+    """
+    p_sum = sum(p_list)
+    p_list = [p / p_sum for p in p_list]
+
+    k_list = [math.floor(max(n * p - eps, 0.0)) for p in p_list]
+    n_left = n - sum(k_list)
+
+    remains = [(n * p - k, -idx) for idx, (p, k) in enumerate(zip(p_list, k_list))]
+    remains.sort(reverse=True)
+
+    for i in range(n_left):
+        k_list[-remains[i][1]] += 1
+
+    return k_list
+
+
+
+def distribute_list(x: List, p_list: List[float], eps: float = 1e-8) -> List[List]:
+    """Distribute list `x` proportional to float numbers in `p_list`.
+
+    Args:
+        n (int): List.
+        p_list (List[float]): Float numbers.
+        eps (float, optional): Epsilon. Defaults to 1e-8.
+
+    Returns:
+        List[List]: Distributed list. Order is preserved.
+    """
+    len_dist = distribute_number(len(x), p_list, eps)
+    len_dist_acc = [0] + list(accumulate(len_dist))
+
+    return [x[l:r] for l, r in zip(len_dist_acc[:-1], len_dist_acc[1:])]

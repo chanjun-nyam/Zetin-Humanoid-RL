@@ -1,4 +1,5 @@
 from isaaclab.envs import DirectRLEnv
+from isaaclab.assets import Articulation
 from isaaclab.managers import EventTermCfg, SceneEntityCfg
 from isaaclab.envs.mdp.events import (
     randomize_rigid_body_material,
@@ -7,6 +8,8 @@ from isaaclab.envs.mdp.events import (
     randomize_actuator_gains,
 )
 from isaaclab.utils import configclass
+
+import torch as th
 
 from typing import Tuple, List, Dict, Literal
 from dataclasses import MISSING
@@ -102,6 +105,18 @@ class RandomizeManagerCfg:
     """Configuration instances of `PDGainCfg`.
     """
 
+    ar_robot: SceneEntityCfg = MISSING
+    """`SceneEntityCfg` of `Articulation`.
+    """
+
+    push_rng: List[Tuple[float, float]] = MISSING
+    """Push velocity range.
+    """
+
+    push_steps: List[int] = MISSING
+    """Episode step numbers when push occurs.
+    """
+
 
 
 class RandomizeManager:
@@ -122,6 +137,10 @@ class RandomizeManager:
         self._randomize_cof()
         self._randomize_mass()
         self._randomize_pd_gain()
+
+        self.robot: Articulation = env.scene[cfg.ar_robot.name]
+        self.push_rng = th.tensor(cfg.push_rng, dtype=th.float32, device=env.device) # (6, 2)
+        self.push_steps = th.tensor(cfg.push_steps, dtype=th.int64, device=env.device) # (n_steps,)
 
 
     def _randomize_cof(self):
@@ -184,3 +203,26 @@ class RandomizeManager:
                 cfg=EventTermCfg(params=params),
                 env=self.env,
             ).__call__(self.env, None, **params)
+
+
+    def _disturbance_push(self):
+        # compute environment indices to apply the push
+        push_mask = th.eq(
+            input=self.env.episode_length_buf.unsqueeze(-1), # (n_env, 1)
+            other=self.push_steps.unsqueeze(0), # (1, n_steps)
+        ).any(dim=-1) # (n_env,)
+        push_ids = push_mask.nonzero().squeeze(-1) # (n_push,)
+
+        # compute the velocity after the push applied
+        l, h = self.push_rng.unbind(dim=-1)
+        root_vel = self.robot.data.root_vel_w[push_ids].clone() # (n_push, 6)
+        root_vel += l + (h - l) * th.rand_like(root_vel)
+
+        # write the velocity to simulator
+        self.robot.write_root_velocity_to_sim(root_vel, push_ids)
+
+
+    def update(self):
+        """Update the manager.
+        """
+        self._disturbance_push()
