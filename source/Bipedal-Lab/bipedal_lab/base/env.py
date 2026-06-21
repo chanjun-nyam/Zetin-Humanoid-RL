@@ -273,7 +273,7 @@ class BipedalEnv(DirectRLEnv):
         self._curriculum_update()
 
         return self.rwd_mgr.reward
-    
+
 
     def _curriculum_reset(self, env_ids: Sequence[int]):
         # exit when curriculum is not enabled

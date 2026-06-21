@@ -18,9 +18,9 @@ class HistoryBuffer:
 
     def __init__(
             self,
-            n_env: int,
+            shape: Tuple[int],
+            zip_dims: Tuple[int],
             n_history: int,
-            n_dim: int,
             device: th.device,
             dtype: th.dtype,
             value: th.Tensor = 0,
@@ -28,27 +28,28 @@ class HistoryBuffer:
         """Initialize the buffer.
 
         Args:
-            n_env (int): Number of vectorized environment dimension.
+            shape (Tuple[int]): Shape of data tensor.
+            zip_dims(Tuple[int]): Dimensions to zip together.
             n_history (int): Length of history.
-            n_dim (int): Number of vector dimension.
             device (th.device): Tensor device.
             dtype (th.dtype): Tensor data type.
             value (th.Tensor, optional): Initial value for buffer. It must broadcastable to `buffer`. Defaults to 0.
         """
-        self.n_env = n_env
+        self.shape = shape
+        self.zip_dims = zip_dims
+        self.zip_shape = tuple([s if d not in zip_dims else 1 for d, s in enumerate(shape)])
         self.n_history = n_history
-        self.n_dim = n_dim
         self.device = device
         self.dtype = dtype
 
-        self._buffer = th.zeros(
-            size=(n_env, n_history, n_dim),
+        self._buff = th.zeros(
+            size=(n_history, *shape),
             device=device,
             dtype=dtype,
         )
 
         # reset buffer
-        self.ALL_INDICES = th.arange(self.n_env, dtype=th.int64, device=device)
+        self.ALL_INDICES = th.ones(size=self.zip_shape, dtype=th.bool, device=device)
         self.reset(self.ALL_INDICES, value)
 
 
@@ -56,6 +57,7 @@ class HistoryBuffer:
     def init_like(
         cls,
         data: th.Tensor,
+        zip_dims: Tuple[int],
         n_history: int,
         device: th.device = None,
         dtype: th.dtype = None,
@@ -65,18 +67,19 @@ class HistoryBuffer:
 
         Args:
             data (th.Tensor): Reference tensor. Shape is (n_env, n_dim).
+            zip_dims(Tuple[int]): Dimensions to zip together.
             n_history (int): Length of history.
             device (th.device, optional): Tensor device. Defaults to None.
             dtype (th.dtype, optional): Tensor data type. Defaults to None.
             value (th.Tensor, optional): Initial value for `buffer`. It must broadcastable to `buffer`. Defaults to 0.
-        
+
         Returns:
             HistoryBuffer: Instance of initialized `HistoryBuffer`.
         """
         return HistoryBuffer(
-            n_env=data.shape[0],
+            shape=tuple(data.shape),
+            zip_dims=zip_dims,
             n_history=n_history,
-            n_dim=data.shape[1],
             device=data.device if device is None else device,
             dtype=data.dtype if dtype is None else dtype,
             value=value,
@@ -87,27 +90,39 @@ class HistoryBuffer:
         """Update the buffer with new data.
 
         Args:
-            data (th.Tensor): New data. Shape is (n_env, n_dim).
+            data (th.Tensor): Data tensor.
         """
-        self._buffer.copy_(self._buffer.roll(shifts=1, dims=1))
-        self._buffer[:,0,:] = data
-    
+        self._buff.copy_(self._buff.roll(shifts=1, dims=0))
+        self._buff[0,...] = data
 
-    def reset(self, env_ids: Sequence[int], value: th.Tensor = 0):
+
+    def reset(self, indices: th.Tensor | Tuple[Sequence[int]] | Sequence[int], value: th.Tensor = 0):
         """Reset the buffer.
 
         Args:
-            env_ids (Sequence[int]): Environment indices to reset.
-            value (th.Tensor, optional): Reset value for buffer. It must broadcastable to (len(env_ids), n_history, n_dim). Defaults to 0.
+            indices (th.Tensor | Tuple[Sequence[int]] | Sequence[int]): Indices to reset. It can be either boolen mask tensor or tuple of indices or just indices when length of tuple is 1.
+            value (th.Tensor, optional): Reset value for buffer.
         """
-        self._buffer[env_ids,:,:] = value
-    
+        if isinstance(indices, th.Tensor) and indices.dtype != th.bool:
+            indices = (indices,)
+
+        if isinstance(indices, th.Tensor):
+            indices = indices.view(*self.zip_shape)
+            self._buff.copy_(th.where(indices, value, self._buff))
+
+        elif isinstance(indices, tuple):
+            indices = tuple([i if d not in self.zip_dims else slice(None) for d, i in enumerate(indices)])
+            self._buff[:,*indices] = value
+
+        else:
+            raise ValueError(f'Not supported type for `indices`: {type(indices)}')
+
 
     @property
-    def buffer(self):
-        """Main buffer. Shape is (n_env, n_history, n_dim)
+    def buff(self):
+        """Main buffer. Shape is (n_history, *shape).
         """
-        return self._buffer
+        return self._buff
 
 
 
@@ -129,6 +144,7 @@ class SMABuffer:
 
         Args:
             shape (Tuple[int]): Shape of data tensor.
+            zip_dims(Tuple[int]): Dimensions to zip together.
             n_window (int): Size of window.
             device (th.device): Device of data tensor.
             dtype (th.dtype): Data type of data tensor.
@@ -177,6 +193,7 @@ class SMABuffer:
 
         Args:
             data (th.Tensor): Reference tensor. Shape is (n_env, n_dim).
+            zip_dims(Tuple[int]): Dimensions to zip together.
             n_window (int): Size of window.
             device (th.device, optional): Tensor device. Defaults to None.
             dtype (th.dtype, optional): Tensor data type. Defaults to None.
@@ -227,15 +244,16 @@ class SMABuffer:
 
             self._buff_len.masked_fill_(indices, 0)
             self._buff.masked_fill_(indices, 0.0)
-
             ptr_slot = self._buff[self.ptr, ...]
             ptr_slot.copy_(th.where(indices, value, ptr_slot))
+
         elif isinstance(indices, tuple):
             indices = tuple([i if d not in self.zip_dims else slice(None) for d, i in enumerate(indices)])
 
             self._buff_len[indices] = 0
             self._buff[:,*indices] = 0.0
             self._buff[self.ptr,...][indices] = value
+
         else:
             raise ValueError(f'Not supported type for `indices`: {type(indices)}')
 
@@ -252,7 +270,7 @@ class SMABuffer:
 
 def direct_rl_env_extended_step(self: DirectRLEnv, action: th.Tensor) -> VecEnvStepReturn:
     """Step function for `BipedalEnv`.
-    
+
     This function is almost identical with `isaaclab.envs.DirectRLEnv.step`, but this includes calling `_post_apply_action` method after every action application on simulator.
     """
     action = action.to(self.device)
@@ -283,7 +301,7 @@ def direct_rl_env_extended_step(self: DirectRLEnv, action: th.Tensor) -> VecEnvS
             self.sim.render()
         # update buffers at sim dt
         self.scene.update(dt=self.physics_dt)
-        
+
         self._post_apply_action()
 
     # post-step:

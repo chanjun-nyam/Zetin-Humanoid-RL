@@ -5,6 +5,12 @@
 
     "python.terminal.activateEnvironment": false,
 
+    "[python]": {
+        "files.trimTrailingWhitespace": true,
+        "files.trimFinalNewlines": true,
+        "files.insertFinalNewline": true
+    },
+
     "files.watcherExclude": {
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true

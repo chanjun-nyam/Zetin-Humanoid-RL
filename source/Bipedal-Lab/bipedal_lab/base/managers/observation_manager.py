@@ -70,7 +70,7 @@ class ObservationManager:
         self._obs_priv = th.zeros_like(dummy_obs_priv)
 
         # initialization observation buffer
-        self._obs_hist = HistoryBuffer.init_like(dummy_obs_t, self.cfg.n_history)
+        self._obs_hist = HistoryBuffer.init_like(dummy_obs_t, (1,), self.cfg.n_history)
 
 
     def update(self, action: th.Tensor):
@@ -124,17 +124,17 @@ class ObservationManager:
         """Observation tensor. Shape is (n_env, n_obs_t).
         """
         return self._obs_t.clone()
-    
+
 
     @property
     def obs_priv(self):
         """Privileged observation tensor. Shape is (n_env, n_priv).
         """
         return self._obs_priv.clone()
-    
+
 
     @property
     def obs_hist(self):
         """Historical observation tensor. Shape is (n_env, n_history, n_obs_t).
         """
-        return self._obs_hist.buffer.clone()
+        return self._obs_hist.buff.transpose(0, 1).contiguous()
