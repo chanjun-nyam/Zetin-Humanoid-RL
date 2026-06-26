@@ -50,8 +50,8 @@ class Tron1SEnvCfg(DefaultEnvCfg):
     )
 
     act_cfg = ActionManagerCfg(
-        min_delayed_steps=1,
-        max_delayed_steps=3,
+        min_delayed_steps=0,
+        max_delayed_steps=0,
 
         ar_robot=SceneEntityCfg(name='robot'),
         q_names=_joint(
@@ -201,7 +201,7 @@ class Tron1SEnvCfg(DefaultEnvCfg):
 
         foot_stance_z       = -0.8,
         foot_clear_z        = 0.2,
-        foot_min_air_ratio  = 0.4,
+        foot_min_air_ratio  = 0.5,
         foot_min_period     = 0.4,
 
         reward_clip         = (-50.0, 100.0),
@@ -223,7 +223,7 @@ class Tron1SEnvCfg(DefaultEnvCfg):
         k_qtau_limit    = -0.001,
         # ----- foot -----
         k_foot_clear    = -0.5, # 0.5 * 0.25 * 2 = 0.25
-        k_foot_ratio    = 0.5,  # 0.5 * 0.4 * 2 = 0.4
+        k_foot_ratio    = 0.5,  # 0.5 * 0.5 * 2 = 0.5
         k_foot_period   = 0.5,  # 0.5 * 1.0 * 2 = 1.0
         k_foot_slip     = -0.25,
         # ----- extras -----

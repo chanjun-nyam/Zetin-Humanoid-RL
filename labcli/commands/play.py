@@ -109,6 +109,11 @@ def main(
         # print(env.env.rdm.qpos[:,[0,1,12,13]])
 
         # TODO
+        # print(env.env.rdm.qpos)
+        # print(env.env.rdm.qvel)
+        # print()
+
+        # TODO
         # print(
         #     f"mec: {info['reward']['mec_energy']:.4f}  "
         #     f"the: {info['reward']['the_energy']:.4f}  "

@@ -330,17 +330,28 @@ class BipedalEnv(DirectRLEnv):
         # update observation manager
         self.obs_mgr.update(action=self.act_mgr.act)
 
+        tmp_cmd = th.zeros_like(self.cmd_mgr.cmd,)
+        tmp_cmd[:,0] = 1.0
         obs_tensor = th.cat([
             self.obs_mgr.obs_hist.view(self.n_env, -1),
-            self.cmd_mgr.cmd,
-            self.obs_mgr.obs_priv, # TODO
+            # self.cmd_mgr.cmd,
+            tmp_cmd,
+            self.obs_mgr.obs_priv,
         ], dim=-1)
-
-        # TODO
-        obs_tensor[:,-3:] = 0.0
+        obs_tensor[:,-3:] = 0.0 # TODO
 
         # update extras
         self.extras = self.step_info
+
+        # print(
+        #     f'issac '
+        #     f'quat: {" | ".join([f"{x:6.3f}" for x in self.rdm.root_quat_w.squeeze(0)])}     '
+        #     f'linv: {" | ".join([f"{x:6.3f}" for x in self.rdm.root_linvel_b.squeeze(0)])}     '
+        #     f'angv: {" | ".join([f"{x:6.3f}" for x in self.rdm.root_angvel_b.squeeze(0)])}     '
+        #     f'qpos: {" | ".join([f"{x:6.3f}" for x in self.rdm.qpos.squeeze(0)])}     '
+        #     f'qvel: {" | ".join([f"{x:6.3f}" for x in self.rdm.qvel.squeeze(0)])}     '
+        #     f'qtrg: {" | ".join([f"{x:6.3f}" for x in self.robot._data.joint_pos_target.squeeze(0)])}'
+        # )
 
         return {'policy': obs_tensor}
 
