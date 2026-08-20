@@ -27,7 +27,7 @@ def main(
     from simple_rl.modules.modules import MlpActorCritic
 
     import bipedal_lab.tasks
-    from bipedal_lab.env_utils import env_loader
+    from bipedal_lab.utils import env_loader
 
     import torch as th
 

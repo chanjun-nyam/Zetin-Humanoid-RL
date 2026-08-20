@@ -1,7 +1,6 @@
 from isaaclab.envs import ManagerBasedRLEnv, DirectRLEnv
 
 from typing import Tuple
-import gymnasium as gym
 import torch as th
 
 from simple_rl.env import BaseEnv

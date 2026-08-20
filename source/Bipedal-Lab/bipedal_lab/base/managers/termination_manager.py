@@ -1,5 +1,3 @@
-from isaaclab.assets import Articulation
-from isaaclab.sensors import ContactSensor
 from isaaclab.envs import DirectRLEnv
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass

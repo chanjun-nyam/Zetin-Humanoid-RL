@@ -7,8 +7,6 @@ from dataclasses import MISSING
 
 import torch as th
 
-from bipedal_lab.base.math_utils import vec_sq_norm
-
 
 
 @configclass
@@ -24,15 +22,20 @@ class CommandManagerCfg:
     """Division numbers of each command dimension - k-th dimension is divided into `cmd_div[k]` sections.
     """
 
-    min_cmd_norm: float = MISSING
-    """Minimum norm which command vector can have.
+    zero_dims: List[int] = MISSING
+    """Dimensions where zero-cmd is applied.
+    """
+
+    zero_ratio: List[float] = MISSING
+    """Ratio of zero-cmd numbers when sampling is on k-phase (k > 0).
     """
 
     phase_len: List[int] = MISSING
     """Length of each phase - `phase_len[k]` is length of k-phase.
-    
+
     Note:
         0-phase is home cell phase and k-phase (k > 0) is random cell phase.
+        zero command is only sampled on k-phase (k > 0).
     """
 
     heading_dims: List[int] = MISSING
@@ -87,8 +90,10 @@ class CommandManager:
         # (n_cmd, 2)
         self._cell_rng = th.tensor(cell_rng_list, dtype=th.float32, device=env.device)
         # (n_cell, n_cmd, 2)
-        self._heading_rng = th.tensor(self.cfg.heading_rng, dtype=th.float32, device=env.device)
+        self._heading_rng = th.tensor(cfg.heading_rng, dtype=th.float32, device=env.device)
         # (n_heading, 2)
+        self._zero_ratio = th.tensor(cfg.zero_ratio, dtype=th.float32, device=env.device)
+        # (n_phase,)
 
 
         self.n_cmd = len(cfg.cmd_rng)
@@ -97,10 +102,10 @@ class CommandManager:
         self.n_heading = len(cfg.heading_dims)
         self.cycle_len = sum(cfg.phase_len)
 
-        self.phase_cumsum = [0] + list(accumulate(self.cfg.phase_len))
+        self.phase_cumsum = [0] + list(accumulate(cfg.phase_len))
 
-        self.heading_dims = th.tensor(self.cfg.heading_dims, dtype=th.int64, device=env.device)
-        self.heading_kp = th.tensor(self.cfg.heading_kp, dtype=th.float32, device=env.device)
+        self.heading_dims = th.tensor(cfg.heading_dims, dtype=th.int64, device=env.device)
+        self.heading_kp = th.tensor(cfg.heading_kp, dtype=th.float32, device=env.device)
 
 
     def init(self, home_cell_idx: th.Tensor):
@@ -124,7 +129,12 @@ class CommandManager:
         # cmd related
         self._cmd = th.zeros(home_cell_idx.shape + (self.n_cmd,),
                              dtype=th.float32, device=self.env.device) # (n_env, n_cmd)
+
         self._is_zero = th.zeros_like(home_cell_idx, dtype=th.bool) # (n_env,)
+        self._zero_dim_mask = th.tensor(
+            [d in self.cfg.zero_dims for d in range(self.n_cmd)],
+            dtype=th.bool, device=self.env.device,
+        )
 
         # reset all environments
         self._phase[:] = -1
@@ -151,6 +161,13 @@ class CommandManager:
         random_heading = l + (h - l) * th.rand_like(self._heading_target) # (n_env, n_heading)
         self._heading_target.copy_(self._heading_target.where(keep_mask, random_heading))
 
+        # sample zero-cmd
+        self._is_zero.copy_(th.where(
+            condition=env_mask,
+            input=th.rand_like(self._is_zero, dtype=th.float32) < self._zero_ratio[self._phase],
+            other=self._is_zero,
+        ))
+
 
     def _update_heading_command(self, heading: th.Tensor | None):
         # assume heading is equal to heading_target when heading is not given
@@ -173,6 +190,10 @@ class CommandManager:
             min=self._cmd_rng[self.heading_dims,0],
             max=self._cmd_rng[self.heading_dims,1],
         )
+
+
+    def _update_zero_cmd(self):
+        self._cmd[self._is_zero.unsqueeze(1) & self._zero_dim_mask] = 0.0
 
 
     def update(self, heading: th.Tensor | None):
@@ -201,10 +222,7 @@ class CommandManager:
         # sample cell index
         self._sample_command(env_mask)
         self._update_heading_command(heading)
-
-        # make zero when command is small enough
-        self._is_zero.copy_(vec_sq_norm(self._cmd) < self.cfg.min_cmd_norm ** 2)
-        self._cmd[self._is_zero] = 0.0
+        self._update_zero_cmd()
 
 
     @property
@@ -230,6 +248,6 @@ class CommandManager:
 
     @property
     def is_zero(self):
-        """Tensor represents whether command is zero or not. Shape is (n_env,).
+        """Tensor represents whether command is zero-cmd. Shape is (n_env,).
         """
         return self._is_zero.clone()

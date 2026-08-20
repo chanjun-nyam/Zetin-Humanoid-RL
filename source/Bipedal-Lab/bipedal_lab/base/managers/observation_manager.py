@@ -5,8 +5,8 @@ from dataclasses import MISSING
 
 import torch as th
 
-from bipedal_lab.base.utils import HistoryBuffer
 from .robot_data_manager import RobotDataManager
+from bipedal_lab.utils.buffer import HistoryBuffer
 
 
 

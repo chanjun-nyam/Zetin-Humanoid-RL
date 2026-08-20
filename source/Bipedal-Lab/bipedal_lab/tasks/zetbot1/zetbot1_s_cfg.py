@@ -16,7 +16,7 @@ from bipedal_lab.base.managers import (
     TerminationManagerCfg,
 )
 import bipedal_lab.primitives.reward as rwd_prims
-from .robot import TRON1_SFOOT_CFG
+from .robot import ZETBOT1_SFOOT_CFG
 
 
 
@@ -24,16 +24,31 @@ from .robot import TRON1_SFOOT_CFG
 _POST_INIT = None
 
 _LINK = {
+    # sangchae
+    'torso': ['base_link'],
+    'head': ['head_1'],
+    'neck': ['neck_1'],
+    'sho':  ['sho_L_1', 'sho_R_1'],
+    'arm':  ['arm_L_1', 'arm_R_1'],
+    'hand': ['hand_L_1','hand_R_1'],
+    # SF_TRON1A
     'base': ['base_Link'],
-    'abad': ['abad_L_Link',     'abad_R_Link'],
-    'hip':  ['hip_L_Link',      'hip_R_Link'],
-    'knee': ['knee_L_Link',     'knee_R_Link'],
-    'ankle':['ankle_L_Link',    'ankle_R_Link'],
+    'abad': ['abad_L_Link', 'abad_R_Link'],
+    'hip':  ['hip_L_Link',  'hip_R_Link'],
+    'knee': ['knee_L_Link', 'knee_R_Link'],
+    'ankle':['ankle_L_Link','ankle_R_Link'],
 }
 def _link(*args):
     return sum([_LINK[a] for a in args], start=[])
 
 _JOINT = {
+    # sangchae
+    'head': ['head'],
+    'neck': ['neck'],
+    'sho':  ['sho_L',   'sho_R'],
+    'arm':  ['arm_L',   'arm_R'],
+    'hand': ['hand_L',  'hand_R'],
+    # SF_TRON1A
     'abad': ['abad_L_Joint',    'abad_R_Joint'],
     'hip':  ['hip_L_Joint',     'hip_R_Joint'],
     'knee': ['knee_L_Joint',    'knee_R_Joint'],
@@ -175,8 +190,21 @@ _shared_buff_mgr = _SharedBuffMgr(
     ar_foot_names=_link('ankle'),
     co_body_names=_link('base', 'abad', 'hip', 'knee'),
     co_foot_names=_link('ankle'),
-    q_names=_joint('abad', 'hip', 'knee', 'ankle'),
+    q_names=_joint(
+        'head', 'neck', 'sho', 'arm', 'hand',
+        'abad', 'hip', 'knee', 'ankle',
+    ),
     qpos_limit=[
+        # sangchae
+        (-0.5, 0.5), # head
+        (-0.5, 0.5), # neck
+        (-0.8, 0.8), # sho_L
+        (-0.8, 0.8), # sho_R
+        (+0.1, 0.8), # arm_L
+        (+0.1, 0.8), # arm_R
+        (-0.8, 0.8), # hand_L
+        (-0.8, 0.8), # hand_R
+        # SF_TRON1A
         (-0.2, 0.6), # abad_L_Joint
         (-0.6, 0.2), # abad_R_Joint
         (-0.1, 0.7), # hip_L_Joint
@@ -187,6 +215,16 @@ _shared_buff_mgr = _SharedBuffMgr(
         (-0.85, 0.85), # ankle_R_Joint
     ],
     qtau_limit=[
+        # sangchae
+        (-4.0, 4.0), # head
+        (-4.0, 4.0), # neck
+        (-10.0, 10.0), # sho_L
+        (-10.0, 10.0), # sho_R
+        (-10.0, 10.0), # arm_L
+        (-10.0, 10.0), # arm_R
+        (-10.0, 10.0), # hand_L
+        (-10.0, 10.0), # hand_R
+        # SF_TRON1A
         (-30.0, 30.0), # abad_L_Joint
         (-30.0, 30.0), # abad_R_Joint
         (-30.0, 30.0), # hip_L_Joint
@@ -201,7 +239,7 @@ _shared_buff_mgr = _SharedBuffMgr(
 
 
 @configclass
-class Tron1SEnvCfg(DefaultEnvCfg):
+class Zetbot1SEnvCfg(DefaultEnvCfg):
 
     # ---------- ROBOT DATA ----------
     rdm_cfg = RobotDataManagerCfg(
@@ -217,17 +255,40 @@ class Tron1SEnvCfg(DefaultEnvCfg):
 
         ar_robot=SceneEntityCfg(name='robot'),
         q_names=_joint(
+            # sangchae
+            'head',
+            'neck',
+            'sho',
+            'arm',
+            'hand',
+            # SF_TRON1A
             'abad', # boundary sign inverted (mirrored value)
             'hip',  # boundary sign inverted
             'knee', # boundary sign inverted
             'ankle',# boundary sign uninverted
         ),
-        act_scale=[0.5] * 8,
+        act_scale=[0.5] * 16,
+        # scale * action = const.
+        # reward
+        # = sum action^2
+        # = sum const.^2 * scale^-2
+        #
+        # reward_before
+        # = sum_1^8 const.^2 * 4
+        # ~ 4 * const.^2
+        #
+        # reward_after
+        # = sum_1^8 const.^2 * 4 + sum_1^8 const.^2 * 1
+        # ~ 4 * const.^2 + 1 * const.^2
+        # = 5 * const.^2
     )
 
 
     # ---------- OBSERVATION ----------
-    obs_q_names = _joint('abad', 'hip', 'knee', 'ankle')
+    obs_q_names = _joint(
+        'head', 'neck', 'sho', 'arm', 'hand',
+        'abad', 'hip', 'knee', 'ankle',
+    )
 
 
     # ---------- COMMAND ----------
@@ -276,7 +337,7 @@ class Tron1SEnvCfg(DefaultEnvCfg):
             ),
         ],
         mass_cfgs=[
-            RandomizeManagerCfg.MassCfg( # base mass
+            RandomizeManagerCfg.MassCfg( # lower body mass
                 ar_body=SceneEntityCfg(name='robot', body_names=_link('base')),
                 add_rng=(-2.0, 2.0),
                 add_com={
@@ -285,8 +346,29 @@ class Tron1SEnvCfg(DefaultEnvCfg):
                     'z': (-0.05, 0.05),
                 },
             ),
+            RandomizeManagerCfg.MassCfg( # upper body mass
+                ar_body=SceneEntityCfg(name='robot', body_names=_link('torso')),
+                add_rng=(-0.5, 0.5),
+                add_com={
+                    'x': (-0.08, 0.08),
+                    'y': (-0.05, 0.05),
+                    'z': (-0.05, 0.05),
+                },
+            ),
         ],
         pd_gain_cfgs=[
+            # sangchae
+            RandomizeManagerCfg.PDGainCfg( # head pd gain
+                ar_joint=SceneEntityCfg(name='robot', joint_names=_joint('head', 'neck')),
+                kp_rng=(5. * 0.8, 5. * 1.2),
+                kd_rng=(0.2 * 0.8, 0.2 * 1.2),
+            ),
+            RandomizeManagerCfg.PDGainCfg( # arms pd gain
+                ar_joint=SceneEntityCfg(name='robot', joint_names=_joint('sho', 'arm', 'hand')),
+                kp_rng=(15. * 0.8, 15. * 1.2),
+                kd_rng=(0.5 * 0.8, 0.5 * 1.2),
+            ),
+            # SF_TRON1A
             RandomizeManagerCfg.PDGainCfg( # legs pd gain
                 ar_joint=SceneEntityCfg(name='robot', joint_names=_joint('abad', 'hip', 'knee')),
                 kp_rng=(45. * 0.8, 45. * 1.2),
@@ -330,16 +412,16 @@ class Tron1SEnvCfg(DefaultEnvCfg):
             'track_ang': rwd_prims.Track(w=0.5, s=4.0, val='angvel_23', cmd='angcmd', n_window=10),
             # ----- motion penalty -----
             'pen_lin': rwd_prims.VecNormPow(w=-2.0, p=2, val='linvel_23'),
-            'pen_ang': rwd_prims.VecNormPow(w=-0.05,p=2, val='angvel_02'),
+            'pen_ang': rwd_prims.VecNormPow(w=-0.01,p=2, val='angvel_02'),
             'upright': rwd_prims.VecNorm(w=-0.5, p=2, val='gravdir_02'),
             # ----- dof penalty -----
-            'qacc': rwd_prims.VecNormPow(w=-2.5e-7, p=2, val='qacc'),
-            'd2_action': rwd_prims.VecNormPow(w=-0.005, p=2, val='d2_action'),
+            'qacc': rwd_prims.VecNormPow(w=-1.2e-7, p=2, val='qacc'),
+            'd2_action': rwd_prims.VecNormPow(w=-0.002, p=2, val='d2_action'),
             'mec_energy': rwd_prims.VecNormPow(w=-2e-4, p=1, val='qpwr'),
             'the_energy': rwd_prims.VecNormPow(w=-2e-5, p=2, val='qtau'),
             'qpos_limit': rwd_prims.VecNormPow(w=-0.1,  p=1, val='qpos_violate'),
             'qtau_limit': rwd_prims.VecNormPow(w=-0.005,p=1, val='qtau_violate'),
-            'qpos': rwd_prims.VecNormPow(w=-0.01, p=1, val='qpos_diff'),
+            'qpos': rwd_prims.VecNormPow(w=-0.03, p=1, val='qpos_diff'),
             # ----- stand -----
             'stand_cont': rwd_prims.Sum(w=0.2, val='foot_cont', mask='is_stand'),
             'stand_clear': rwd_prims.FootClear(w=-0.5, p=1, stance_z=-0.72, clear_z=0.15, mask='is_stand'),
@@ -376,9 +458,11 @@ class Tron1SEnvCfg(DefaultEnvCfg):
     def __post_init__(self):
         super().__post_init__()
 
-        self.scene.robot = TRON1_SFOOT_CFG.replace(prim_path='{ENV_REGEX_NS}/Robot')
+        self.scene.robot = ZETBOT1_SFOOT_CFG.replace(prim_path='{ENV_REGEX_NS}/Robot')
+        # note. sangchae part in use does not includes any collider
+        self.scene.contact_sensor.prim_path = '{ENV_REGEX_NS}/Robot/SF_TRON1A/.*'
 
-        n_qdim = 8
+        n_qdim = 8 + 8
 
         self.action_space = n_qdim
         self.observation_space = (

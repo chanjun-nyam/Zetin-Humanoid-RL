@@ -1,6 +1,6 @@
 from typing import Type, Dict
 
-from bipedal_lab.env_utils.env_wrapper import IsaacEnvWrapper
+from .env_wrapper import IsaacEnvWrapper
 
 from simple_rl.env import BaseEnv
 

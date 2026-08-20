@@ -7,22 +7,22 @@ import torch as th
 from typing import Tuple
 from collections.abc import Sequence
 
-from bipedal_lab.base.env_cfg import BipedalEnvCfg
-from bipedal_lab.base.utils import (
+from .env_cfg import BipedalEnvCfg
+from .utils import (
     direct_rl_env_extended_step,
     distribute_list,
-    SMABuffer,
 )
-from bipedal_lab.base.managers import (
+from .managers import (
     ActionManager,
     CommandManager,
-    ObservationManager,
     RandomizeManager,
     RewardManager,
     RobotDataManager,
     TerminationManager,
 )
-from bipedal_lab.base.math_utils import (
+from bipedal_lab.utils.buffer import HistoryBuffer, SMABuffer
+from bipedal_lab.utils.math import (
+    vec_norm,
     vec_sq_norm,
     quat_twist,
 )
@@ -55,26 +55,45 @@ class BipedalEnv(DirectRLEnv):
         if not isinstance(self.cfg.observation_space, int):
             raise ValueError('Only vector observation space is supported.')
 
-        # dimension values
+        # initialize dimension values
         self.n_env = self.num_envs
         self.n_act = self.cfg.action_space
         self.n_obs = self.cfg.observation_space
 
+        # initialize tensors/buffers
         self.ALL_INDICES = th.arange(self.n_env, dtype=th.int64, device=self.device) # (n_env,)
+        self.TWIST_AXIS = th.tensor([0, 0, 1], dtype=th.float32, device=self.device) # (3,)
 
-        self.TWIST_AXIS = th.tensor([0, 0, 1], dtype=th.float32, device=self.device).repeat(self.n_env, 1) # (n_env, 3)
+        self.gait_freq = th.zeros(size=(self.n_env,), dtype=th.float32, device=self.device)
+        self.gait_clock = th.zeros(size=(self.n_env,), dtype=th.float32, device=self.device)
+        self.gait_ratio = th.zeros(size=(self.n_env,), dtype=th.float32, device=self.device)
+        self.gait_theta = th.zeros(size=(self.n_env, 2), dtype=th.float32, device=self.device)
+        # TODO: gait
+
+        self.obs_hist: HistoryBuffer = None
 
         # initialize managers
         self.rdm = RobotDataManager(cfg=self.cfg.rdm_cfg, env=self)
         self.act_mgr = ActionManager(cfg=self.cfg.act_cfg, env=self)
         self.cmd_mgr = CommandManager(cfg=self.cfg.cmd_cfg, env=self)
-        self.obs_mgr = ObservationManager(cfg=self.cfg.obs_cfg, rdm=self.rdm)
         self.rnd_mgr = RandomizeManager(cfg=self.cfg.rnd_cfg, env=self)
-        self.rwd_mgr = RewardManager(cfg=self.cfg.rwd_cfg, env=self, rdm=self.rdm, cmd_mgr=self.cmd_mgr)
+        self.rwd_mgr = RewardManager(cfg=self.cfg.rwd_cfg, env=self)
         self.ter_mgr = TerminationManager(cfg=self.cfg.ter_cfg, env=self, rdm=self.rdm)
 
-        # curriculum init
+        # initialize curriculum
         self._curriculum_init()
+
+        # observation q-idx mapping
+        q_names, ref_q_names = cfg.obs_q_names, self.rdm.q_names
+        self.obs_to_q_ref = [q_names.index(x) for x in ref_q_names if x in q_names]
+        self.obs_from_q_ref = [ref_q_names.index(x) for x in q_names]
+
+        # capture domain randomization parameter coefficients
+        self.rnd_kp_coeff = self.robot.data.joint_stiffness / self.robot.data.default_joint_stiffness
+        self.rnd_kd_coeff = self.robot.data.joint_damping / self.robot.data.default_joint_damping
+        self.rnd_mass_coeff = (
+            self.robot.root_physx_view.get_masses()[:,0] - self.robot.data.default_mass[:,0]).to(self.device)
+        self.rnd_material_props = self.robot.root_physx_view.get_material_properties()[:,0,:].to(self.device)
 
         # access to step_info before any call of step if undefined behavior
         self.step_info = None
@@ -108,7 +127,9 @@ class BipedalEnv(DirectRLEnv):
             raise ValueError('Other than 1.0 for SubTerrainBaseCfg.proportion is not allowed.')
         # check whether sub-terrain configuration of generator's one and self.cfg's one is maching
         if list(gen_sub_terrains.keys()) != list(my_sub_terrains.keys()):
-            raise ValueError('Keys in sub-terrain configuration of generator\'s one and self.cfg\'s one is not match.')
+            raise ValueError(
+                'Keys in sub-terrain configuration of generator\'s one and self.cfg\'s one is not match.'
+            )
 
         # just for convenient, we are gonna handle sub-terrain configuration
         # with it's key-list and value-list together instead of one dictionary
@@ -152,7 +173,7 @@ class BipedalEnv(DirectRLEnv):
         # curriculum related buffers
         self.is_foll_cnt = th.zeros_like(self.ALL_INDICES) # (n_env,)
         self.move_updown = th.zeros_like(self.ALL_INDICES) # (n_env,)
-        self.vel_err_buff = SMABuffer.init_like(self.cmd_mgr.cmd, (1,), self.cfg.vel_err_sma_window)
+        self.vel_err_buff = SMABuffer.init_like(self.cmd_mgr.cmd[:,0:3], (1,), self.cfg.vel_err_sma_window)
 
 
     def _setup_scene(self):
@@ -177,16 +198,42 @@ class BipedalEnv(DirectRLEnv):
 
         self.physics_step_cnt = 0
 
+        # update gait-related tensors
+        self.gait_freq.copy_(self.cmd_mgr.cmd[:,3])
+        # clamp required stride distance
+        req_linvel = vec_norm(self.cmd_mgr.cmd[:,0:2])
+        self.gait_freq.copy_(th.where(
+            req_linvel / self.gait_freq.clip(min=1e-6) > self.cfg.max_stride,
+            req_linvel / self.cfg.max_stride,
+            self.gait_freq,
+        ))
+
+        self.gait_clock.add_((2.0 * th.pi * self.step_dt) * self.gait_freq)
+        self.gait_clock.remainder_(2.0 * th.pi)
+
+        self.gait_ratio.copy_(self.cmd_mgr.cmd[:,4])
+
+        self.gait_theta[:,0].copy_(self.gait_clock)
+        self.gait_theta[:,1].copy_(self.gait_clock + self.cmd_mgr.cmd[:,5])
+        self.gait_theta.remainder_(2.0 * th.pi)
+        # TODO: gait
+
 
     def _apply_action(self):
         # update delayed action
         self.act_mgr.update()
 
         # compute setpoint
-        setpoint = self.rdm.qpos_default + self.act_mgr.act_delayed * self.act_mgr.q_scale
+        setpoint = (
+            self.rdm.qpos_default[:, self.act_mgr.from_q_ref] +
+            self.act_mgr.act_delayed * self.act_mgr.act_scale
+        )
 
         # set setpoint of pd-controller for joints
-        self.robot.set_joint_position_target(setpoint)
+        self.robot.set_joint_position_target(
+            target=setpoint,
+            joint_ids=self.act_mgr.from_q_ref,
+        )
 
 
     def _post_apply_action(self):
@@ -211,10 +258,12 @@ class BipedalEnv(DirectRLEnv):
             return
 
         # tensor of commanded velocity and real robot's velocity
-        cmd = self.cmd_mgr.cmd # (n_env, n_cmd)
+        cmd = self.cmd_mgr.cmd[:,0:3] # (n_env, 3)
         vel = th.cat([
             self.rdm.root_linvel_b[:,0:2],
-            self.rdm.root_angvel_b[:,2:3]], dim=-1) # (n_env, 3)
+            self.rdm.root_angvel_b[:,2:3]],
+        dim=-1) # (n_env, 3)
+        # TODO
 
         # update velocity error sma-buffer
         self.vel_err_buff.update(cmd - vel)
@@ -261,15 +310,11 @@ class BipedalEnv(DirectRLEnv):
 
     def _get_rewards(self) -> th.Tensor:
         # update reward manager
-        self.rwd_mgr.update(
-            d_action=self.act_mgr.act_diff(o=1),
-            d2_action=self.act_mgr.act_diff(o=2),
-            terminated=self.ter_mgr.terminated,
-        )
+        self.rwd_mgr.update()
         # update reward info
         self.step_info['reward'] = self.rwd_mgr.info
 
-        # curriculum update
+        # update curriculum
         self._curriculum_update()
 
         return self.rwd_mgr.reward
@@ -301,7 +346,7 @@ class BipedalEnv(DirectRLEnv):
         if len(env_ids) == self.n_env:
             self.episode_length_buf.copy_(th.randint_like(self.ALL_INDICES, self.max_episode_length))
 
-        # curriculum reset
+        # reset curriculum
         self._curriculum_reset(env_ids)
 
         # reset root and joint state
@@ -319,41 +364,65 @@ class BipedalEnv(DirectRLEnv):
             env_ids=env_ids,
         )
 
+        # reset tensors/buffers
+        if self.obs_hist is not None:
+            self.obs_hist.reset(env_ids)
+
         # reset managers
         self.rdm.reset(env_ids)
         self.act_mgr.reset(env_ids)
-        self.obs_mgr.reset(env_ids)
         self.rwd_mgr.reset(env_ids)
 
 
     def _get_observations(self) -> VecEnvObs:
-        # update observation manager
-        self.obs_mgr.update(action=self.act_mgr.act)
-
-        tmp_cmd = th.zeros_like(self.cmd_mgr.cmd,)
-        tmp_cmd[:,0] = 1.0
-        obs_tensor = th.cat([
-            self.obs_mgr.obs_hist.view(self.n_env, -1),
-            # self.cmd_mgr.cmd,
-            tmp_cmd,
-            self.obs_mgr.obs_priv,
+        # compute observation tensors/buffers
+        obs_hist_t = th.cat([
+            self.rdm.root_angvel_b * 0.25,
+            self.rdm.gravity_dir_b,
+            (self.rdm.qpos - self.rdm.qpos_default)[:, self.obs_from_q_ref],
+            (self.rdm.qvel - self.rdm.qvel_default)[:, self.obs_from_q_ref] * 0.05,
+            self.act_mgr.act,
         ], dim=-1)
-        obs_tensor[:,-3:] = 0.0 # TODO
+        if self.obs_hist is None:
+            self.obs_hist = HistoryBuffer.init_like(obs_hist_t, (1,), self.cfg.n_obs_history)
+
+        self.obs_hist.update(obs_hist_t)
+        obs_hist = self.obs_hist.buff.transpose(0, 1).contiguous() # (n_env, n_history, n_obs_hist_t)
+
+        obs_cmd = th.cat([
+            self.cmd_mgr.cmd[:,0:3],
+            self.gait_freq.unsqueeze(1),
+            self.gait_ratio.unsqueeze(1),
+            self.gait_theta.sin() * self.cmd_mgr.is_zero.logical_not().unsqueeze(1),
+            self.gait_theta.cos() * self.cmd_mgr.is_zero.logical_not().unsqueeze(1),
+        ], dim=-1)
+
+        obs_priv = th.cat([
+            self.rdm.root_linvel_b,
+            self.act_mgr.delay_table.to(th.float32).unsqueeze(1),
+            self.rnd_kp_coeff,
+            self.rnd_kd_coeff,
+            self.rnd_mass_coeff.unsqueeze(1),
+            self.rnd_material_props,
+            self.robot.data.root_com_pos_w,
+        ], dim=-1)
+
+        # final observation
+        observation = {
+            'obs_hist_t': obs_hist_t,
+            'obs_hist': obs_hist,
+            'obs_cmd': obs_cmd,
+            'obs_priv': obs_priv,
+        }
+        observation = th.cat([
+            observation['obs_hist'].view(self.n_env, -1),
+            observation['obs_cmd'],
+        ], dim=-1) # TODO
 
         # update extras
         self.extras = self.step_info
 
-        # print(
-        #     f'issac '
-        #     f'quat: {" | ".join([f"{x:6.3f}" for x in self.rdm.root_quat_w.squeeze(0)])}     '
-        #     f'linv: {" | ".join([f"{x:6.3f}" for x in self.rdm.root_linvel_b.squeeze(0)])}     '
-        #     f'angv: {" | ".join([f"{x:6.3f}" for x in self.rdm.root_angvel_b.squeeze(0)])}     '
-        #     f'qpos: {" | ".join([f"{x:6.3f}" for x in self.rdm.qpos.squeeze(0)])}     '
-        #     f'qvel: {" | ".join([f"{x:6.3f}" for x in self.rdm.qvel.squeeze(0)])}     '
-        #     f'qtrg: {" | ".join([f"{x:6.3f}" for x in self.robot._data.joint_pos_target.squeeze(0)])}'
-        # )
-
-        return {'policy': obs_tensor}
+        return {'policy': observation}
 
 
     def _set_debug_vis_impl(self, debug_vis: bool):

@@ -9,8 +9,8 @@ from dataclasses import MISSING
 
 import torch as th
 
-from bipedal_lab.base.utils import SMABuffer
-from bipedal_lab.base.math_utils import (
+from bipedal_lab.utils.buffer import SMABuffer
+from bipedal_lab.utils.math import (
     quat_apply,
     quat_conj,
     vec_sq_norm,
@@ -49,7 +49,7 @@ class RobotDataManager:
         Args:
             cfg (ArticulationDataManagerCfg): Configuration instance for the manager.
             env (DirectRLEnv): Environment instance.
-        
+
         Raises:
             ValueError: When history length of contact sensor is not equal with decimation of environment.
         """
@@ -123,6 +123,7 @@ class RobotDataManager:
         # ----- q(generalized coordinates) -----
         self._qpos = _zeros(self.n_env, self.n_qdim)
         self._qvel = SMABuffer.init_like(_zeros(self.n_env, self.n_qdim), (1,), decim)
+        self._qacc = SMABuffer.init_like(_zeros(self.n_env, self.n_qdim), (1,), decim)
         self._qtau = SMABuffer.init_like(_zeros(self.n_env, self.n_qdim), (1,), decim)
         self._qpos_default = _zeros(self.n_env, self.n_qdim)
         self._qvel_default = _zeros(self.n_env, self.n_qdim)
@@ -210,6 +211,7 @@ class RobotDataManager:
 
         # ----- q(generalized coordinates) -----
         self._qvel.update(self.robot.data.joint_vel)
+        self._qacc.update(self.robot.data.joint_acc)
         self._qtau.update(self.robot.data.applied_torque)
 
 
@@ -260,6 +262,7 @@ class RobotDataManager:
 
         # ----- q(generalized coordinates) -----
         self._qvel.reset(env_ids, self.robot.data.joint_vel[env_ids])
+        self._qacc.reset(env_ids, self.robot.data.joint_acc[env_ids])
         self._qtau.reset(env_ids, self.robot.data.applied_torque[env_ids])
 
         # reset source tensors
@@ -281,7 +284,7 @@ class RobotDataManager:
     def n_cbody(self):
         """Number of bodies in contact sensor."""
         return self._n_cbody
-    
+
     @property
     def n_qdim(self):
         """Number of joints in articulation"""
@@ -442,6 +445,11 @@ class RobotDataManager:
     def qvel(self):
         """Generalized velocities of articulation. Shape is (n_env, n_qdim)."""
         return self._qvel.sma
+
+    @property
+    def qacc(self):
+        """Generalized acceleration of articulation. Shape is (n_env, n_qdim)"""
+        return self._qacc.sma
 
     @property
     def qtau(self):

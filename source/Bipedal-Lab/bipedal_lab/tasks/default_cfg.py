@@ -68,15 +68,20 @@ class SceneCfg(InteractiveSceneCfg):
 
 
 
-def _get_check(t: Literal['slow', 'fast']):
+def _get_check(t):
     def check(rng: th.Tensor):
         # input shape: (n_cell, n_cmd, 2)
         # output shape: (n_cell,)
         cent = rng.mean(dim=-1) # (n_cell, n_cmd)
-        if t == 'slow':
-            return cent[:,0].abs() < 1.0
-        elif t == 'fast':
-            return th.ones_like(cent[:,0], dtype=th.bool)
+        cent_x = cent[:,0] # (n_cell,)
+        ans = th.zeros_like(cent_x, dtype=th.bool)
+        if 's' in t:
+            ans.logical_or_((0.0 <= cent_x.abs()) & (cent_x.abs() <= 1.0))
+        if 'm' in t:
+            ans.logical_or_((1.0 <= cent_x.abs()) & (cent_x.abs() <= 1.5))
+        if 'f' in t:
+            ans.logical_or_((1.5 <= cent_x.abs()) & (cent_x.abs() <= 2.0))
+        return ans
     return check
 
 
@@ -118,27 +123,31 @@ class DefaultEnvCfg(BipedalEnvCfg):
     ar_robot = SceneEntityCfg(name='robot')
 
     sub_terrains = {
-        'stair_inv':BipedalEnvCfg.SubTerrainCfg(prop=0.2, check=_get_check('slow')),
-        'stair':    BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
-        'wave':     BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
-        'grid':     BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
-        'uniform':  BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
-        'slope_inv':BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
-        'slope':    BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('fast')),
+        'stair_inv':BipedalEnvCfg.SubTerrainCfg(prop=0.4, check=_get_check('s')),
+        'stair':    BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('s')),
+        'wave':     BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('s')),
+        'grid':     BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('s')),
+        'uniform':  BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('s')),
+        'slope_inv':BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('s')),
+        'slope':    BipedalEnvCfg.SubTerrainCfg(prop=0.1, check=_get_check('s')),
     }
 
-    vel_err_sma_window = 20 # 0.4s
+    vel_err_sma_window = 25 # 0.5s
 
     foll_boundary = 0.4
 
     foll_hyst = (0.5, 0.7) # Note. 10m / (1m/s * 12s) = 0.833
+
+    max_stride = 1.2
+
+    n_obs_history = 5
 
     # ----------
 
 
     def __post_init__(self):
         super().__post_init__()
-        
+
         self.sim.device = self.device
         self.sim.dt = self.sim_dt
         self.sim.render_interval = self.decimation

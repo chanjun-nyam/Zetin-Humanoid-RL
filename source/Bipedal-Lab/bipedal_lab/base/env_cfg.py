@@ -3,14 +3,13 @@ from isaaclab.envs import DirectRLEnvCfg
 from isaaclab.utils import configclass
 
 from dataclasses import MISSING
-from typing import List, Tuple, Dict, Callable
+from typing import Tuple, List, Dict, Callable
 
 import torch as th
 
-from bipedal_lab.base.managers import (
+from .managers import (
     ActionManagerCfg,
     CommandManagerCfg,
-    ObservationManagerCfg,
     RandomizeManagerCfg,
     RewardManagerCfg,
     RobotDataManagerCfg,
@@ -49,6 +48,10 @@ class BipedalEnvCfg(DirectRLEnvCfg):
     """Hysteresis range of following rate.
     """
 
+    max_stride: float = MISSING
+    """Maximum stride distance which defines feasible input command.
+    """
+
     rdm_cfg: RobotDataManagerCfg = MISSING
     """Configuration for `RobotDataManager`.
     """
@@ -59,10 +62,6 @@ class BipedalEnvCfg(DirectRLEnvCfg):
 
     cmd_cfg: CommandManagerCfg = MISSING
     """Configuration for `CommandManager`.
-    """
-
-    obs_cfg: ObservationManagerCfg = MISSING
-    """Configuration for `ObservationManager`.
     """
 
     rnd_cfg: RandomizeManagerCfg = MISSING
@@ -76,3 +75,5 @@ class BipedalEnvCfg(DirectRLEnvCfg):
     ter_cfg: TerminationManagerCfg = MISSING
     """Configuration for `TerminationManager`.
     """
+
+    obs_q_names: List[str] = MISSING

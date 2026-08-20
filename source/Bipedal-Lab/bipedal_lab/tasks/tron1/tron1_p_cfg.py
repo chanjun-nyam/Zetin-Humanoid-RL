@@ -1,23 +1,26 @@
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
+from typing import Tuple, List
+
+import torch as th
 import math
 
 from bipedal_lab.tasks.default_cfg import DefaultEnvCfg
-from bipedal_lab.tasks.tron1.robot import TRON1_PFOOT_CFG
-
 from bipedal_lab.base.managers import (
     ActionManagerCfg,
     CommandManagerCfg,
-    ObservationManagerCfg,
     RandomizeManagerCfg,
     RewardManagerCfg,
     RobotDataManagerCfg,
     TerminationManagerCfg,
 )
+import bipedal_lab.primitives.reward as rwd_prims
+from .robot import TRON1_PFOOT_CFG
 
 
 
+# ---------- USD INFO: Link/Joint ----------
 _POST_INIT = None
 
 _LINK = {
@@ -40,14 +43,169 @@ def _joint(*args):
 
 
 
+# ---------- SHARED BUFFER: FROM REWARD MGR ----------
+class _SharedBuffMgr:
+    keys = [
+        # ----- tracking/motion penalty -----
+        'linvel_02', 'linvel_23', 'angvel_02', 'angvel_23',
+        'lincmd', 'angcmd', 'gravdir_02',
+        # ----- dof penalty -----
+        'qacc', 'qpwr', 'qtau', 'd1_action', 'd2_action',
+        'qpos_violate', 'qtau_violate', 'qpos_diff',
+        # ----- foot/gait -----
+        'rdm', 'ar_foot_ids', 'co_foot_ids',
+        'gait_theta', 'gait_ratio', 'is_stand', 'is_walk', 'foot_cont',
+        # ----- extras -----
+        'pen_contact', 'terminated',
+    ]
+
+
+    def __init__(
+            self,
+            ar_foot_names: List[str],
+            co_body_names: List[str],
+            co_foot_names: List[str],
+            q_names: List[str],
+            qpos_limit: List[Tuple[float, float]],
+            qtau_limit: List[Tuple[float, float]],
+        ):
+        self.cfg_ar_foot_names = ar_foot_names
+        self.cfg_co_body_names = co_body_names
+        self.cfg_co_foot_names = co_foot_names
+        self.cfg_q_names = q_names
+        self.cfg_qpos_limit = qpos_limit
+        self.cfg_qtau_limit = qtau_limit
+
+        self.shared: dict = None
+
+
+    def _update_shared(self):
+        for key in self.keys:
+            if hasattr(self, key):
+                self.shared[key] = getattr(self, key)
+
+
+    def init(self, mgr, shared: dict):
+        self.shared = shared
+
+        # q-idx mapping
+        q_names, ref_q_names = self.cfg_q_names, mgr.env.rdm.q_names
+        self.to_q_ref = [q_names.index(x) for x in ref_q_names if x in q_names]
+        self.from_q_ref = [ref_q_names.index(x) for x in q_names]
+
+        # ---------- shared ----------
+        self.ar_foot = SceneEntityCfg(
+            name='robot',
+            body_names=self.cfg_ar_foot_names,
+            preserve_order=True,
+        )
+        self.co_body = SceneEntityCfg(
+            name='contact_sensor',
+            body_names=self.cfg_co_body_names,
+        )
+        self.co_foot = SceneEntityCfg(
+            name='contact_sensor',
+            body_names=self.cfg_co_foot_names,
+            preserve_order=True,
+        )
+        self.ar_foot.resolve(mgr.env.scene)
+        self.co_foot.resolve(mgr.env.scene)
+        self.co_body.resolve(mgr.env.scene)
+
+        self.qpos_limit = th.tensor(
+            self.cfg_qpos_limit, dtype=th.float32, device=mgr.env.device) # (n_qdim, 2)
+        self.qtau_limit = th.tensor(
+            self.cfg_qtau_limit, dtype=th.float32, device=mgr.env.device) # (n_qdim, 2)
+
+        self._update_shared()
+
+
+    def update(self, mgr, shared: dict):
+        rdm = mgr.env.rdm
+        act_mgr = mgr.env.act_mgr
+        cmd_mgr = mgr.env.cmd_mgr
+        ter_mgr = mgr.env.ter_mgr
+
+        qpos_violate = rdm.qpos[:,self.from_q_ref].unsqueeze(-1) - self.qpos_limit
+        qpos_violate[:,:,0].clip_(max=0.0)
+        qpos_violate[:,:,1].clip_(min=0.0)
+        qpos_violate = th.sum(qpos_violate, dim=2)
+
+        qtau_violate = rdm.qtau[:,self.from_q_ref].unsqueeze(-1) - self.qtau_limit
+        qtau_violate[:,:,0].clip_(max=0.0)
+        qtau_violate[:,:,1].clip_(min=0.0)
+        qtau_violate = th.sum(qtau_violate, dim=2)
+
+        # ---------- shared ----------
+        # ----- tracking/motion penalty -----
+        self.linvel_02 = rdm.root_linvel_b[:,0:2]
+        self.linvel_23 = rdm.root_linvel_b[:,2:3]
+        self.angvel_02 = rdm.root_angvel_b[:,0:2]
+        self.angvel_23 = rdm.root_angvel_b[:,2:3]
+        self.lincmd = cmd_mgr.cmd[:,0:2]
+        self.angcmd = cmd_mgr.cmd[:,2:3]
+        self.gravdir_02 = rdm.gravity_dir_b[:,0:2]
+        # ----- dof penalty -----
+        self.qacc = rdm.qacc[:,self.from_q_ref]
+        self.qpwr = (rdm.qtau * rdm.qvel)[:,self.from_q_ref]
+        self.qtau = rdm.qtau[:,self.from_q_ref]
+        self.d1_action = act_mgr.act_diff(o=1)
+        self.d2_action = act_mgr.act_diff(o=2)
+        self.qpos_violate = qpos_violate
+        self.qtau_violate = qtau_violate
+        self.qpos_diff = (rdm.qpos - rdm.qpos_default)[:,self.from_q_ref]
+        # ----- foot/gait -----
+        self.rdm = rdm
+        self.ar_foot_ids = self.ar_foot.body_ids
+        self.co_foot_ids = self.co_foot.body_ids
+        self.gait_theta = mgr.env.gait_theta
+        self.gait_ratio = mgr.env.gait_ratio
+        self.is_stand = cmd_mgr.is_zero
+        self.is_walk = cmd_mgr.is_zero.logical_not()
+        self.foot_cont = rdm.is_cont[:,self.co_foot.body_ids]
+        # ----- extras -----
+        self.pen_contact = rdm.is_cont[:,self.co_body.body_ids]
+        self.terminated = ter_mgr.terminated
+
+        self._update_shared()
+
+
+_shared_buff_mgr = _SharedBuffMgr(
+    ar_foot_names=_link('foot'),
+    co_body_names=_link('base', 'abad', 'hip', 'knee'),
+    co_foot_names=_link('foot'),
+    q_names=_joint('abad', 'hip', 'knee'),
+    qpos_limit=[
+        (-0.2, 0.6), # abad_L_Joint
+        (-0.6, 0.2), # abad_R_Joint
+        (-0.1, 0.7), # hip_L_Joint
+        (-0.7, 0.1), # hip_R_Joint
+        (-0.1, 1.0), # knee_L_Joint
+        (-1.0, 0.1), # knee_R_Joint
+    ],
+    qtau_limit=[
+        (-30.0, 30.0), # abad_L_Joint
+        (-30.0, 30.0), # abad_R_Joint
+        (-30.0, 30.0), # hip_L_Joint
+        (-30.0, 30.0), # hip_R_Joint
+        (-30.0, 30.0), # knee_L_Joint
+        (-30.0, 30.0), # knee_R_Joint
+    ],
+)
+
+
+
 @configclass
 class Tron1PEnvCfg(DefaultEnvCfg):
 
+    # ---------- ROBOT DATA ----------
     rdm_cfg = RobotDataManagerCfg(
         ar_robot=SceneEntityCfg(name='robot'),
         co_robot=SceneEntityCfg(name='contact_sensor'),
     )
 
+
+    # ---------- ACTION ----------
     act_cfg = ActionManagerCfg(
         min_delayed_steps=0,
         max_delayed_steps=0,
@@ -58,30 +216,39 @@ class Tron1PEnvCfg(DefaultEnvCfg):
             'hip',  # boundary sign inverted
             'knee', # boundary sign inverted
         ),
-        q_scale=[
-            0.5, # abad_L_Joint
-            0.5, # abad_R_Joint
-            0.5, # hip_L_Joint
-            0.5, # hip_R_Joint
-            0.5, # knee_L_Joint
-            0.5, # knee_R_Joint
-        ],
+        act_scale=[0.5] * 6,
     )
 
+
+    # ---------- OBSERVATION ----------
+    obs_q_names = _joint('abad', 'hip', 'knee')
+
+
+    # ---------- COMMAND ----------
     cmd_cfg = CommandManagerCfg(
         cmd_rng=[
-            (-1.5, 1.5), # x-linear velocity
-            (-1.0, 1.0), # y-linear velocity
-            (-1.0, 1.0), # z-angular velocity
+            # ----- velocity -----
+            (-1.0, 1.0), # x-linear velocity [m/s]
+            (-1.0, 1.0), # y-linear velocity [m/s]
+            (-1.0, 1.0), # z-angular velocity [m/s]
+            # ----- gait -----
+            (1.0, 1.8), # gait frequency [Hz]
+            (0.5, 0.5), # gait ratio
+            (th.pi, th.pi), # gait offset
         ],
         cmd_div=[
-            12, # x-linear
+            8,  # x-linear
             8,  # y-linear
             1,  # z-angular (heading command)
+            1,  # gait frequency
+            1,  # gait ratio
+            1,  # gait offset
         ],
 
-        min_cmd_norm=0.2,
-        phase_len=[600, 200, 200],
+        zero_dims=[0, 1, 2, 3, 4, 5],
+        zero_ratio=[0.0, 0.2, 0.2, 0.2, 0.2], # total: 0.2 * 0.4 = 0.08
+
+        phase_len=[600, 100, 100, 100, 100],
 
         heading_dims=[2],
         heading_rng=[
@@ -90,44 +257,34 @@ class Tron1PEnvCfg(DefaultEnvCfg):
         heading_kp=[0.5],
     )
 
-    obs_cfg = ObservationManagerCfg(
-        n_history=10,
-        obs_scale=[
-            0.25,   # root_angvel_b
-            1.0,    # gravity_dir_b
-            1.0,    # qpos
-            0.05,   # qvel
-            1.0,    # action
-            1.0,    # root_linvel_t
-        ],
-    )
 
+    # ---------- DOMAIN RANDOMIZE ----------
     rnd_cfg = RandomizeManagerCfg(
         cof_cfgs=[
             RandomizeManagerCfg.CofCfg( # foot cof
                 ar_body=SceneEntityCfg(name='robot', body_names=_link('foot')),
-                static_cof_rng=(0.6, 1.0),
-                kinetic_cof_rng=(0.4, 0.8),
-                cor_rng=(0.0, 0.0),
+                static_cof_rng=(0.5, 1.0),
+                kinetic_cof_rng=(0.3, 0.8),
+                cor_rng=(0.0, 1.0),
                 n_bucket=_POST_INIT,
             ),
         ],
         mass_cfgs=[
             RandomizeManagerCfg.MassCfg( # base mass
                 ar_body=SceneEntityCfg(name='robot', body_names=_link('base')),
-                add_rng=(-2.0, 2.0 + 8.0),
+                add_rng=(-2.0, 2.0),
                 add_com={
-                    'x': (-0.05, 0.05),
+                    'x': (-0.08, 0.08),
                     'y': (-0.05, 0.05),
-                    'z': (-0.02, 0.02 + 0.03),
+                    'z': (-0.05, 0.05),
                 },
             ),
         ],
         pd_gain_cfgs=[
             RandomizeManagerCfg.PDGainCfg( # legs pd gain
                 ar_joint=SceneEntityCfg(name='robot', joint_names=_joint('abad', 'hip', 'knee')),
-                kp_rng=(45.0 * 0.95, 45.0 * 1.05),
-                kd_rng=(1.50 * 0.95, 1.50 * 1.05),
+                kp_rng=(45. * 0.8, 45. * 1.2),
+                kd_rng=(1.5 * 0.8, 1.5 * 1.2),
             ),
         ],
 
@@ -136,87 +293,65 @@ class Tron1PEnvCfg(DefaultEnvCfg):
             (-1.0, 1.0), # linvel_x
             (-1.0, 1.0), # linvel_y
             (-1.0, 1.0), # linvel_z
-            (-0.5, 0.5), # angvel_x
-            (-0.5, 0.5), # angvel_y
-            (-0.5, 0.5), # angvel_z
+            (-1.0, 1.0), # angvel_x
+            (-1.0, 1.0), # angvel_y
+            (-1.0, 1.0), # angvel_z
         ],
-        push_steps=[350, 700],
+        push_steps=[50, 350, 800],
     )
 
+
+    # ---------- REWARD ----------
     rwd_cfg = RewardManagerCfg(
-        ar_foot=SceneEntityCfg(
-            name='robot',
-            body_names=_link('foot'),
-            preserve_order=True,
-        ),
-        co_body=SceneEntityCfg(
-            name='contact_sensor',
-            body_names=_link('base', 'abad', 'hip', 'knee'),
-        ),
-        co_foot=SceneEntityCfg(
-            name='contact_sensor',
-            body_names=_link('foot'),
-            preserve_order=True,
-        ),
+        clip_rng = (-100.0, 100.0),
 
-        vel_err_sma_window = 10,
-        track_lin_err_scale = 4.0,
-        track_ang_err_scale = 4.0,
+        bonus_threshold = 0.0,
 
-        q_names=_joint(
-            'abad', # boundary sign inverted (mirrored value)
-            'hip',  # boundary sign inverted
-            'knee', # boundary sign inverted
-        ),
-        qpos_limit=[
-            (-0.2, 0.5), # abad_L_Joint
-            (-0.5, 0.2), # abad_R_Joint
-            (-0.6, 0.6), # hip_L_Joint
-            (-0.6, 0.6), # hip_R_Joint
-            (-0.3, 1.2), # knee_L_Joint
-            (-1.2, 0.3), # knee_R_Joint
-        ],
-        qtau_limit=[
-            (-30.0, 30.0), # abad_L_Joint
-            (-30.0, 30.0), # abad_R_Joint
-            (-30.0, 30.0), # hip_L_Joint
-            (-30.0, 30.0), # hip_R_Joint
-            (-30.0, 30.0), # knee_L_Joint
-            (-30.0, 30.0), # knee_R_Joint
-        ],
+        init_shared_buff = _shared_buff_mgr.init,
 
-        foot_stance_z       = -0.8,
-        foot_clear_z        = 0.2,
-        foot_min_air_ratio  = 0.5,
-        foot_min_period     = 0.4,
+        update_shared_buff = _shared_buff_mgr.update,
 
-        reward_clip         = (-50.0, 100.0),
-        min_mean_reward     = 0.0,
-
-        # ----- tracking -----
-        k_track_lin     = 1.0,
-        k_track_ang     = 0.5,
-        # ----- motion penalty -----
-        k_pen_lin       = -2.0,
-        k_pen_ang       = -0.05,
-        k_upright       = -0.2,
-        # ----- dof penalty -----
-        k_mec_energy    = -1e-4,
-        k_the_energy    = -2e-5,
-        k_d_action      = -0.005,
-        k_d2_action     = -0.005,
-        k_qpos_limit    = -0.05,
-        k_qtau_limit    = -0.001,
-        # ----- foot -----
-        k_foot_clear    = -0.5, # 0.5 * 0.25 * 2 = 0.25
-        k_foot_ratio    = 0.5,  # 0.5 * 0.5 * 2 = 0.5
-        k_foot_period   = 0.5,  # 0.5 * 1.0 * 2 = 1.0
-        k_foot_slip     = -0.25,
-        # ----- extras -----
-        k_contact       = -0.5,
-        k_termin        = -10.0,
+        terms = {
+            # ----- alive -----
+            'alive': rwd_prims.Val(w=0.5, val=1.0),
+            # ----- tracking -----
+            'track_lin': rwd_prims.Track(w=1.0, s=4.0, val='linvel_02', cmd='lincmd', n_window=10),
+            'track_ang': rwd_prims.Track(w=0.5, s=4.0, val='angvel_23', cmd='angcmd', n_window=10),
+            # ----- motion penalty -----
+            'pen_lin': rwd_prims.VecNormPow(w=-2.0, p=2, val='linvel_23'),
+            'pen_ang': rwd_prims.VecNormPow(w=-0.05,p=2, val='angvel_02'),
+            'upright': rwd_prims.VecNorm(w=-0.5, p=2, val='gravdir_02'),
+            # ----- dof penalty -----
+            'qacc': rwd_prims.VecNormPow(w=-2.5e-7, p=2, val='qacc'),
+            'd2_action': rwd_prims.VecNormPow(w=-0.005, p=2, val='d2_action'),
+            'mec_energy': rwd_prims.VecNormPow(w=-2e-4, p=1, val='qpwr'),
+            'the_energy': rwd_prims.VecNormPow(w=-2e-5, p=2, val='qtau'),
+            'qpos_limit': rwd_prims.VecNormPow(w=-0.1,  p=1, val='qpos_violate'),
+            'qtau_limit': rwd_prims.VecNormPow(w=-0.005,p=1, val='qtau_violate'),
+            'qpos': rwd_prims.VecNormPow(w=-0.01, p=1, val='qpos_diff'),
+            # ----- stand -----
+            'stand_cont': rwd_prims.Sum(w=0.2, val='foot_cont', mask='is_stand'),
+            'stand_clear': rwd_prims.FootClear(w=-0.5, p=1, stance_z=-0.72, clear_z=0.15, mask='is_stand'),
+            'stand_qpos': rwd_prims.VecNormPow(w=-0.1, p=1, val='qpos_diff', mask='is_stand'),
+            # ----- gait/foot -----
+            'slip': rwd_prims.FootSlip(w=-0.25),
+            'clear': rwd_prims.FootClear(w=-0.5, p=1, stance_z=-0.72, clear_z=0.15),
+            'gait': rwd_prims.Gait(
+                w=-0.5,
+                k=4,
+                s_frc=25.0,
+                s_spd=0.2,
+                n_sample=1000,
+                mask='is_walk',
+            ),
+            # ----- extras -----
+            'contact': rwd_prims.Sum(w=-1.0, val='pen_contact'),
+            'termin': rwd_prims.Val(w=-20.0, val='terminated'),
+        },
     )
 
+
+    # ---------- TERMINATION ----------
     ter_cfg = TerminationManagerCfg(
         co_termin=SceneEntityCfg(
             name='contact_sensor',
@@ -233,10 +368,13 @@ class Tron1PEnvCfg(DefaultEnvCfg):
         self.scene.robot = TRON1_PFOOT_CFG.replace(prim_path='{ENV_REGEX_NS}/Robot')
 
         n_qdim = 6
-        n_cmd = len(self.cmd_cfg.cmd_rng)
 
         self.action_space = n_qdim
-        self.observation_space = (3 * 2 + n_qdim * 3) * self.obs_cfg.n_history + n_cmd + 3
+        self.observation_space = (
+            (6 + n_qdim * 3) * self.n_obs_history +
+            9 +
+            (10 + n_qdim * 3) * 0
+        )
 
         # ----------
 

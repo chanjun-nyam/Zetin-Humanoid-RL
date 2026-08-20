@@ -4,8 +4,8 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 from collections.abc import Sequence
-from typing import List
 from dataclasses import MISSING
+from typing import List
 
 import gymnasium.spaces as spaces
 import torch as th
@@ -33,7 +33,7 @@ class ActionManagerCfg:
 
     q_names: List[str] = MISSING
 
-    q_scale: List[float] = MISSING
+    act_scale: List[float] = MISSING
 
 
 
@@ -84,13 +84,6 @@ class ActionManager:
             device=env.device,
         )
 
-        # q-scale (action scale) tensor
-        idx_map = [cfg.q_names.index(name) for name in self.robot.data.joint_names]
-        self._q_scale = th.tensor(
-            [cfg.q_scale[idx_map[i]] for i in range(len(idx_map))],
-            dtype=th.float32, device=env.device,
-        ) # (n_qdim,)
-
         # initialize delay table
         self.delay_table = th.randint_like(
             input=self._act_delayed[:,0],
@@ -99,6 +92,16 @@ class ActionManager:
             dtype=th.int64,
         )
         self.since_update_action = 0
+
+        # action scale tensor
+        self._act_scale = th.tensor(
+            cfg.act_scale,
+            dtype=th.float32, device=env.device) # (n_act,)
+
+        # q-idx mapping
+        q_names, ref_q_names = cfg.q_names, self.robot.joint_names
+        self.to_q_ref = [q_names.index(x) for x in ref_q_names if x in q_names]
+        self.from_q_ref = [ref_q_names.index(x) for x in q_names]
 
 
     def update_action(self, action: th.Tensor):
@@ -159,14 +162,14 @@ class ActionManager:
         """Action tensor. Shape is (n_env, n_act).
         """
         return self._act_diff[0][:,0,:].clone()
-    
+
 
     @property
     def act_delayed(self):
         """Delayed action tensor. Shape is (n_env, n_act).
         """
         return self._act_delayed.clone()
-    
+
 
     def act_diff(self, o: int, t: int = 0):
         """`t`-th previous `o`-th order action difference tensor. Shape is (n_env, n_act).
@@ -185,7 +188,7 @@ class ActionManager:
 
 
     @property
-    def q_scale(self):
-        """q-scale (action scale) tensor. Shape is (n_qdim,).
+    def act_scale(self):
+        """action scale tensor. Shape is (n_act,).
         """
-        return self._q_scale.clone()
+        return self._act_scale.clone()

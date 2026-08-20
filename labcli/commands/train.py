@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 
 import typer
@@ -29,7 +30,7 @@ def main(
     from simple_rl.modules.modules import MlpActorCritic
 
     import bipedal_lab.tasks
-    from bipedal_lab.env_utils import env_loader
+    from bipedal_lab.utils import env_loader
 
     import torch as th
 
@@ -61,8 +62,12 @@ def main(
         value_clip_param=0.2,
         grad_norm_clip=1.0,
         normalize_advantage=True,
-        # entropy_loss_coeff=0.01,
-        entropy_loss_coeff=0.01 * (1.0 if env.n_action == 8 else 0.4), # TODO
+        entropy_loss_coeff={
+            'Tron1-P': 0.01 * 1.0,
+            'Tron1-S': 0.01 * 0.8,
+            'Zetbot1-S': 0.01 * 0.4,
+            'Zetbot2': 0.01 * 0.66,
+        }[env_id], # TODO
         value_loss_coeff=1.0,
     )
     ppo = PPO(env.spec, actor_critic, ppo_cfg)
@@ -76,7 +81,7 @@ def main(
     runner = PPORunner(
         env=env,
         algo=ppo,
-        run_dir=run_dir,
+        run_dir=str(Path(run_dir) / env_id),
         log_interval=2,
         checkpoint_interval=300,
     )

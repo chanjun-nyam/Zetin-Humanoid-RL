@@ -7,13 +7,13 @@ import os
 
 
 _CWD = os.path.dirname(__file__)
-_ZETBOT_SFOOT_USD_PATH = os.path.join(_CWD, './usd/SF_ZETBOT/soccerbot.usd')
+_ZETBOT1_SFOOT_USD_PATH = os.path.join(_CWD, './usd/SF_ZETBOT/soccerbot.usd')
 
 
 
-ZETBOT_SFOOT_CFG = ArticulationCfg(
+ZETBOT1_SFOOT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=_ZETBOT_SFOOT_USD_PATH,
+        usd_path=_ZETBOT1_SFOOT_USD_PATH,
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             rigid_body_enabled=True,
@@ -28,7 +28,7 @@ ZETBOT_SFOOT_CFG = ArticulationCfg(
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=True,
             solver_position_iteration_count=4,
-            solver_velocity_iteration_count=4,
+            solver_velocity_iteration_count=0,
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
